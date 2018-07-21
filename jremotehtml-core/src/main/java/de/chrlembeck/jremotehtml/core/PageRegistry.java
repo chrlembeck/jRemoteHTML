@@ -6,6 +6,8 @@ import java.util.TreeMap;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
+import de.chrlembeck.jremotehtml.core.element.Page;
+
 @Component
 public class PageRegistry {
 

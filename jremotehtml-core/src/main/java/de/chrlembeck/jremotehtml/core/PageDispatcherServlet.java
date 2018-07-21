@@ -21,6 +21,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
+import de.chrlembeck.jremotehtml.core.element.Page;
+import de.chrlembeck.jremotehtml.core.element.Tag;
+
 @WebServlet(urlPatterns = "/javahtml/*")
 @Component
 public class PageDispatcherServlet extends HttpServlet {

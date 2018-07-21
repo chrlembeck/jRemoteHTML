@@ -1,4 +1,4 @@
-package de.chrlembeck.jremotehtml.core;
+package de.chrlembeck.jremotehtml.core.element;
 
 public class Span extends Tag {
 

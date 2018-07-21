@@ -1,4 +1,6 @@
-package de.chrlembeck.jremotehtml.core;
+package de.chrlembeck.jremotehtml.core.change;
+
+import de.chrlembeck.jremotehtml.core.element.Tag;
 
 public class NewClickListener implements Change {
 

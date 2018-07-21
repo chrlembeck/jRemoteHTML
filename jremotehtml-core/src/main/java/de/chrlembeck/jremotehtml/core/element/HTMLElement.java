@@ -1,8 +1,10 @@
-package de.chrlembeck.jremotehtml.core;
+package de.chrlembeck.jremotehtml.core.element;
 
 import java.io.IOException;
 import java.io.Writer;
 import java.util.List;
+
+import de.chrlembeck.jremotehtml.core.change.Change;
 
 public interface HTMLElement {
 
@@ -17,4 +19,6 @@ public interface HTMLElement {
     boolean isNewNode();
 
     void unsetId();
+
+    void setParent(Tag tag);
 }

@@ -3,10 +3,10 @@ package de.chrlembeck.jremotehtml;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import de.chrlembeck.jremotehtml.core.Page;
 import de.chrlembeck.jremotehtml.core.PageRegistry;
-import de.chrlembeck.jremotehtml.core.Span;
-import de.chrlembeck.jremotehtml.core.Tag;
+import de.chrlembeck.jremotehtml.core.element.Page;
+import de.chrlembeck.jremotehtml.core.element.Span;
+import de.chrlembeck.jremotehtml.core.element.Tag;
 
 @Configuration
 public class PageConfiguration {

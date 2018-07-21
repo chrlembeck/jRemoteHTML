@@ -1,4 +1,4 @@
-package de.chrlembeck.jremotehtml.core;
+package de.chrlembeck.jremotehtml.core.element;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -9,6 +9,10 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.springframework.util.Assert;
+
+import de.chrlembeck.jremotehtml.core.ClickListener;
+import de.chrlembeck.jremotehtml.core.change.Change;
+import de.chrlembeck.jremotehtml.core.change.NewClickListener;
 
 public abstract class Tag implements HTMLElement {
 
@@ -60,6 +64,7 @@ public abstract class Tag implements HTMLElement {
         return name;
     }
 
+    @Override
     public void setParent(Tag parent) {
         this.parent = parent;
     }
@@ -70,11 +75,12 @@ public abstract class Tag implements HTMLElement {
 
     public void addClickListener(ClickListener listener) {
         clickListeners.add(listener);
-        notifyChange(new AddClickListenerChange(this));
+        notifyChange(new NewClickListener(this));
     }
 
     public void appendElement(HTMLElement tag) {
         children.add(tag);
+        tag.setParent(this);
     }
 
     protected void notifyChange(Change change) {

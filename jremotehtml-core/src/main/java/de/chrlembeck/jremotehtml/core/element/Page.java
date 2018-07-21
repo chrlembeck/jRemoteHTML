@@ -1,4 +1,4 @@
-package de.chrlembeck.jremotehtml.core;
+package de.chrlembeck.jremotehtml.core.element;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -15,6 +15,12 @@ import org.springframework.http.MediaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
+import de.chrlembeck.jremotehtml.core.change.AppendTag;
+import de.chrlembeck.jremotehtml.core.change.Change;
+import de.chrlembeck.jremotehtml.core.change.NewClickListener;
+import de.chrlembeck.jremotehtml.core.change.serializer.AppendTagSerializer;
+import de.chrlembeck.jremotehtml.core.change.serializer.NewClickListenerSerializer;
+
 public class Page {
 
     private static Logger LOGGER = LoggerFactory.getLogger(Page.class);
@@ -24,19 +30,18 @@ public class Page {
     /**
      * Id für das nächste an den Client zu sendende Element.
      */
-    private int id = 0;
+    private int id;
 
     /**
      * Zuletzt an den Client gesandte ElementId;
      */
     private int lastSentId;
 
-    private final BodyTag bodyNode;
+    private final BodyTag bodyNode = new BodyTag(this);
 
     private List<Change> changes = new ArrayList<>();
 
     public Page() {
-        this.bodyNode = new BodyTag();
         bodyNode.setId(nextId());
     }
 

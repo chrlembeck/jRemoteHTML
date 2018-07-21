@@ -1,4 +1,4 @@
-package de.chrlembeck.jremotehtml.core;
+package de.chrlembeck.jremotehtml.core.change.serializer;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -6,6 +6,11 @@ import java.io.StringWriter;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
+
+import de.chrlembeck.jremotehtml.core.change.AppendTag;
+import de.chrlembeck.jremotehtml.core.element.HTMLElement;
+import de.chrlembeck.jremotehtml.core.element.Page;
+import de.chrlembeck.jremotehtml.core.element.Tag;
 
 public class AppendTagSerializer extends JsonSerializer<AppendTag> {
 

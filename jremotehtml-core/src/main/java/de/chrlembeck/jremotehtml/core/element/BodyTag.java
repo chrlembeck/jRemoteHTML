@@ -1,21 +1,21 @@
-package de.chrlembeck.jremotehtml.core;
+package de.chrlembeck.jremotehtml.core.element;
+
+import de.chrlembeck.jremotehtml.core.change.Change;
 
 public class BodyTag extends Tag {
 
     private Page page;
 
-    public BodyTag() {
+    public BodyTag(Page page) {
         super("body");
+        this.page = page;
+        setId(page.nextId());
         setAttribute("onload", "loadContent()");
     }
 
     @Override
     public Page getPage() {
         return page;
-    }
-
-    public void setPage(Page page) {
-        this.page = page;
     }
 
     @Override

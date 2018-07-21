@@ -1,4 +1,7 @@
-package de.chrlembeck.jremotehtml.core;
+package de.chrlembeck.jremotehtml.core.change;
+
+import de.chrlembeck.jremotehtml.core.element.HTMLElement;
+import de.chrlembeck.jremotehtml.core.element.Tag;
 
 public class AppendTag implements Change {
 
