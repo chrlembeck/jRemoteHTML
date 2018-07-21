@@ -13,7 +13,7 @@ import org.springframework.util.Assert;
 
 import de.chrlembeck.jremotehtml.core.ClickListener;
 import de.chrlembeck.jremotehtml.core.change.Change;
-import de.chrlembeck.jremotehtml.core.change.NewClickListener;
+import de.chrlembeck.jremotehtml.core.change.NewClickListenerChange;
 
 public abstract class Tag implements HTMLElement, Iterable<HTMLElement> {
 
@@ -76,7 +76,7 @@ public abstract class Tag implements HTMLElement, Iterable<HTMLElement> {
 
     public void addClickListener(ClickListener listener) {
         clickListeners.add(listener);
-        notifyChange(new NewClickListener(this));
+        notifyChange(new NewClickListenerChange(this));
     }
 
     public void appendElement(HTMLElement tag) {
@@ -97,7 +97,7 @@ public abstract class Tag implements HTMLElement, Iterable<HTMLElement> {
     @Override
     public void collectListeners(List<Change> listeners) {
         if (clickListeners != null && !clickListeners.isEmpty()) {
-            listeners.add(new NewClickListener(this));
+            listeners.add(new NewClickListenerChange(this));
         }
         for (HTMLElement element : children) {
             element.collectListeners(listeners);

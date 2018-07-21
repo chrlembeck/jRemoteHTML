@@ -20,7 +20,7 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 
 import de.chrlembeck.jremotehtml.core.change.AppendTagChange;
 import de.chrlembeck.jremotehtml.core.change.Change;
-import de.chrlembeck.jremotehtml.core.change.NewClickListener;
+import de.chrlembeck.jremotehtml.core.change.NewClickListenerChange;
 import de.chrlembeck.jremotehtml.core.change.serializer.AppendTagSerializer;
 import de.chrlembeck.jremotehtml.core.change.serializer.NewClickListenerSerializer;
 
@@ -75,7 +75,7 @@ public class Page {
         ObjectMapper objectMapper = new ObjectMapper();
         SimpleModule module = new SimpleModule();
         module.addSerializer(AppendTagChange.class, new AppendTagSerializer(this));
-        module.addSerializer(NewClickListener.class, new NewClickListenerSerializer());
+        module.addSerializer(NewClickListenerChange.class, new NewClickListenerSerializer());
         objectMapper.registerModule(module);
 
         try (OutputStreamWriter writer = new OutputStreamWriter(resp.getOutputStream(), "UTF-8")) {
@@ -140,7 +140,7 @@ public class Page {
         resp.setCharacterEncoding("UTF-8");
         ObjectMapper objectMapper = new ObjectMapper();
         SimpleModule module = new SimpleModule();
-        module.addSerializer(NewClickListener.class, new NewClickListenerSerializer());
+        module.addSerializer(NewClickListenerChange.class, new NewClickListenerSerializer());
         objectMapper.registerModule(module);
         List<Change> listeners = new ArrayList<>();
         getBodyNode().collectListeners(listeners);
