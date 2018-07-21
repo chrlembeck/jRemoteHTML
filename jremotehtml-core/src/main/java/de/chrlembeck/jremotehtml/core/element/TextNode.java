@@ -39,8 +39,6 @@ public class TextNode implements HTMLElement {
         if (parent == null || parent.isNewNode()) {
             return true;
         }
-
-        // TODO FIXME ALERT Prüfung einbauen, ob der knoten wirklich neu ist.
         return getParent().getPage().isNewTextNode(this);
     }
 
