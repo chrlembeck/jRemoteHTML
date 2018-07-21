@@ -18,10 +18,10 @@ import org.springframework.util.Assert;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
-import de.chrlembeck.jremotehtml.core.change.AppendTagChange;
 import de.chrlembeck.jremotehtml.core.change.Change;
+import de.chrlembeck.jremotehtml.core.change.InsertTagChange;
 import de.chrlembeck.jremotehtml.core.change.NewClickListenerChange;
-import de.chrlembeck.jremotehtml.core.change.serializer.AppendTagSerializer;
+import de.chrlembeck.jremotehtml.core.change.serializer.InsertTagSerializer;
 import de.chrlembeck.jremotehtml.core.change.serializer.NewClickListenerSerializer;
 
 public class Page {
@@ -74,7 +74,7 @@ public class Page {
         resp.setCharacterEncoding("UTF-8");
         ObjectMapper objectMapper = new ObjectMapper();
         SimpleModule module = new SimpleModule();
-        module.addSerializer(AppendTagChange.class, new AppendTagSerializer(this));
+        module.addSerializer(InsertTagChange.class, new InsertTagSerializer(this));
         module.addSerializer(NewClickListenerChange.class, new NewClickListenerSerializer());
         objectMapper.registerModule(module);
 
@@ -115,7 +115,8 @@ public class Page {
         queue.add(bodyNode);
         while (!queue.isEmpty()) {
             Tag currentTag = queue.poll();
-            for (HTMLElement element : currentTag) {
+            for (int index = 0; index < currentTag.getChildCount(); index++) {
+                final HTMLElement element = currentTag.childAd(index);
                 if (element.isNewNode()) {
                     if (element instanceof Tag) {
                         // Bei neuen Tags jetzt erst einmal neue Ids vergeben
@@ -123,13 +124,17 @@ public class Page {
                     }
                     // den neuen Knoten in die Liste der Client-Änderungen
                     // übernehmen
-                    changes.add(new AppendTagChange(currentTag, element));
+                    changes.add(new InsertTagChange(currentTag, element, index));
                     // die Listener für die neuen Knoten hinzufügen
                     element.collectListeners(changes);
-                } else if (element instanceof Tag) {
-                    // TextNodes müssen nicht weiter überprüft werden, da sie
-                    // keine children haben können.
-                    queue.offer((Tag) element);
+                } else {
+                    if (element instanceof Tag) {
+
+                        // TextNodes müssen nicht weiter überprüft werden, da
+                        // sie
+                        // keine children haben können.
+                        queue.offer((Tag) element);
+                    }
                 }
             }
         }
