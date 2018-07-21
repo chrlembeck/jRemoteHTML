@@ -3,6 +3,7 @@ package de.chrlembeck.jremotehtml.core.element;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -14,7 +15,7 @@ import de.chrlembeck.jremotehtml.core.ClickListener;
 import de.chrlembeck.jremotehtml.core.change.Change;
 import de.chrlembeck.jremotehtml.core.change.NewClickListener;
 
-public abstract class Tag implements HTMLElement {
+public abstract class Tag implements HTMLElement, Iterable<HTMLElement> {
 
     public static final int NO_ID = -1;
 
@@ -31,7 +32,7 @@ public abstract class Tag implements HTMLElement {
     private Map<String, String> attributes = new TreeMap<>();
 
     @Override
-    public final void render(Page page, Writer writer) throws IOException {
+    public final void render(Writer writer) throws IOException {
         Assert.isTrue(id != NO_ID, "Zu diesem Zeitpunkt sollte der Knoten eine ID besitzen.");
         writer.write("<" + name + " id=\"" + getId() + "\"");
         for (Map.Entry<String, String> attribute : attributes.entrySet()) {
@@ -43,7 +44,7 @@ public abstract class Tag implements HTMLElement {
         }
         writer.write(">");
         for (HTMLElement element : children) {
-            element.render(page, writer);
+            element.render(writer);
         }
         writer.write("</" + name + ">\n");
     }
@@ -109,8 +110,8 @@ public abstract class Tag implements HTMLElement {
         }
     }
 
-    public Tag getTagById(String elementId) {
-        if (elementId.equals(this.id)) {
+    public Tag getTagById(int elementId) {
+        if (elementId == this.id) {
             return this;
         } else {
             for (HTMLElement element : children) {
@@ -140,11 +141,11 @@ public abstract class Tag implements HTMLElement {
         id = NO_ID;
     }
 
-    public void assignIds(Page page) {
-        if (id == NO_ID) {
-            id = page.nextId();
-        }
-        children.stream().filter(e -> (e instanceof Tag)).map(e -> (Tag) e).forEach(e -> e.assignIds(page));
+    public void assignIds(final Page page) {
+        Assert.isTrue(id == NO_ID, "Der Knoten darf vorher noch keine Id gehabt haben.");
+        id = page.nextId();
+        children.stream().filter(element -> (element instanceof Tag)).map(element -> (Tag) element)
+                .forEach(tag -> tag.assignIds(page));
     }
 
     @Override
@@ -153,10 +154,15 @@ public abstract class Tag implements HTMLElement {
             return true;
         }
         final Page page = getPage();
-        return page == null || page.getLastSentId() >= id;
+        return page == null || id == NO_ID || page.getLastSentId() < id;
     }
 
     protected Page getPage() {
         return parent == null ? null : parent.getPage();
+    }
+
+    @Override
+    public Iterator<HTMLElement> iterator() {
+        return children.iterator();
     }
 }

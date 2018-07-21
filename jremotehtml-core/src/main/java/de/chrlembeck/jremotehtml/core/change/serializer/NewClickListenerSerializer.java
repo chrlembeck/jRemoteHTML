@@ -7,15 +7,8 @@ import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 
 import de.chrlembeck.jremotehtml.core.change.NewClickListener;
-import de.chrlembeck.jremotehtml.core.element.Page;
 
 public class NewClickListenerSerializer extends JsonSerializer<NewClickListener> {
-
-    private Page page;
-
-    public NewClickListenerSerializer(Page page) {
-        this.page = page;
-    }
 
     @Override
     public void serialize(NewClickListener value, JsonGenerator jgen, SerializerProvider serializers)

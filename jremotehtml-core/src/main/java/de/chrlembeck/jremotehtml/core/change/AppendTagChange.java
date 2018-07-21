@@ -3,13 +3,13 @@ package de.chrlembeck.jremotehtml.core.change;
 import de.chrlembeck.jremotehtml.core.element.HTMLElement;
 import de.chrlembeck.jremotehtml.core.element.Tag;
 
-public class AppendTag implements Change {
+public class AppendTagChange implements Change {
 
 	private Tag parentTag;
 
 	private HTMLElement newChild;
 
-	public AppendTag(Tag parentTag, HTMLElement newChild) {
+	public AppendTagChange(Tag parentTag, HTMLElement newChild) {
 		this.parentTag = parentTag;
 		this.newChild = newChild;
 	}

@@ -4,18 +4,21 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
+import org.springframework.util.Assert;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
-import de.chrlembeck.jremotehtml.core.change.AppendTag;
+import de.chrlembeck.jremotehtml.core.change.AppendTagChange;
 import de.chrlembeck.jremotehtml.core.change.Change;
 import de.chrlembeck.jremotehtml.core.change.NewClickListener;
 import de.chrlembeck.jremotehtml.core.change.serializer.AppendTagSerializer;
@@ -71,7 +74,8 @@ public class Page {
         resp.setCharacterEncoding("UTF-8");
         ObjectMapper objectMapper = new ObjectMapper();
         SimpleModule module = new SimpleModule();
-        module.addSerializer(AppendTag.class, new AppendTagSerializer(this));
+        module.addSerializer(AppendTagChange.class, new AppendTagSerializer(this));
+        module.addSerializer(NewClickListener.class, new NewClickListenerSerializer());
         objectMapper.registerModule(module);
 
         try (OutputStreamWriter writer = new OutputStreamWriter(resp.getOutputStream(), "UTF-8")) {
@@ -84,13 +88,13 @@ public class Page {
     private List<Change> collectChanges() {
         List<Change> result = new ArrayList<>();
         findRemovedElements(result);
-        findNewElements(result);
         findModifiedProperties(result);
         findModifiedListeners(result);
+        findNewElements(result);
         return result;
     }
 
-    private void findModifiedListeners(List<Change> result) {
+    private void findRemovedElements(List<Change> result) {
         // TODO Auto-generated method stub
 
     }
@@ -100,14 +104,35 @@ public class Page {
 
     }
 
-    private void findNewElements(List<Change> result) {
+    private void findModifiedListeners(List<Change> result) {
         // TODO Auto-generated method stub
 
     }
 
-    private void findRemovedElements(List<Change> result) {
-        // TODO Auto-generated method stub
-
+    private void findNewElements(List<Change> changes) {
+        Queue<Tag> queue = new LinkedList<>();
+        Assert.isTrue(bodyNode.isNewNode() == false, "Der BodyNode darf nie 'neu' sein.");
+        queue.add(bodyNode);
+        while (!queue.isEmpty()) {
+            Tag currentTag = queue.poll();
+            for (HTMLElement element : currentTag) {
+                if (element.isNewNode()) {
+                    if (element instanceof Tag) {
+                        // Bei neuen Tags jetzt erst einmal neue Ids vergeben
+                        ((Tag) element).assignIds(this);
+                    }
+                    // den neuen Knoten in die Liste der Client-Änderungen
+                    // übernehmen
+                    changes.add(new AppendTagChange(currentTag, element));
+                    // die Listener für die neuen Knoten hinzufügen
+                    element.collectListeners(changes);
+                } else if (element instanceof Tag) {
+                    // TextNodes müssen nicht weiter überprüft werden, da sie
+                    // keine children haben können.
+                    queue.offer((Tag) element);
+                }
+            }
+        }
     }
 
     public void sendListeners(HttpServletResponse resp) throws IOException {
@@ -115,7 +140,7 @@ public class Page {
         resp.setCharacterEncoding("UTF-8");
         ObjectMapper objectMapper = new ObjectMapper();
         SimpleModule module = new SimpleModule();
-        module.addSerializer(NewClickListener.class, new NewClickListenerSerializer(this));
+        module.addSerializer(NewClickListener.class, new NewClickListenerSerializer());
         objectMapper.registerModule(module);
         List<Change> listeners = new ArrayList<>();
         getBodyNode().collectListeners(listeners);
@@ -139,7 +164,7 @@ public class Page {
         changes.clear();
     }
 
-    public Tag getTagById(String elementId) {
+    public Tag getTagById(int elementId) {
         return bodyNode.getTagById(elementId);
     }
 }

@@ -17,7 +17,7 @@ public class TextNode implements HTMLElement {
     }
 
     @Override
-    public void render(Page page, Writer writer) throws IOException {
+    public void render(Writer writer) throws IOException {
         writer.append(text);
     }
 
@@ -29,6 +29,7 @@ public class TextNode implements HTMLElement {
         return parent;
     }
 
+    @Override
     public void setParent(Tag parent) {
         this.parent = parent;
     }

@@ -8,7 +8,7 @@ import de.chrlembeck.jremotehtml.core.change.Change;
 
 public interface HTMLElement {
 
-    void render(Page page, Writer writer) throws IOException;
+    void render(Writer writer) throws IOException;
 
     void collectListeners(List<Change> listeners);
 
