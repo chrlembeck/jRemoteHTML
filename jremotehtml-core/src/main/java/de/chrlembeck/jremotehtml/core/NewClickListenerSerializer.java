@@ -6,21 +6,20 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 
-
 public class NewClickListenerSerializer extends JsonSerializer<NewClickListener> {
 
-	private Page page;
+    private Page page;
 
-	public NewClickListenerSerializer(Page page) {
-		this.page = page;
-	}
+    public NewClickListenerSerializer(Page page) {
+        this.page = page;
+    }
 
-	@Override
-	public void serialize(NewClickListener value, JsonGenerator jgen, SerializerProvider serializers)
-			throws IOException {
-		jgen.writeStartObject();
-		jgen.writeStringField("action", "newClickListener");
-		jgen.writeStringField("elementId", value.getTag().getId(page));
-		jgen.writeEndObject();
-	}
+    @Override
+    public void serialize(NewClickListener value, JsonGenerator jgen, SerializerProvider serializers)
+            throws IOException {
+        jgen.writeStartObject();
+        jgen.writeStringField("action", "newClickListener");
+        jgen.writeNumberField("elementId", value.getTag().getId());
+        jgen.writeEndObject();
+    }
 }

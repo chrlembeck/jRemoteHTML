@@ -6,18 +6,43 @@ import java.util.List;
 
 public class TextNode implements HTMLElement {
 
-	private String text;
+    private String text;
 
-	public TextNode(String text) {
-		this.text = text;
-	}
+    private Tag parent;
 
-	@Override
-	public void render(Page page, Writer writer) throws IOException {
-		writer.append(text);
-	}
+    public TextNode(String text) {
+        this.text = text;
+    }
 
-	@Override
-	public void collectListeners(List<Change> listeners) {
-	}
+    @Override
+    public void render(Page page, Writer writer) throws IOException {
+        writer.append(text);
+    }
+
+    @Override
+    public void collectListeners(List<Change> listeners) {
+    }
+
+    public Tag getParent() {
+        return parent;
+    }
+
+    public void setParent(Tag parent) {
+        this.parent = parent;
+    }
+
+    @Override
+    public boolean isNewNode() {
+        if (parent == null || parent.isNewNode()) {
+            return true;
+        }
+
+        // TODO FIXME ALERT Prüfung einbauen, ob der knoten wirklich neu ist.
+        return false;
+    }
+
+    @Override
+    public void unsetId() {
+        // nothing to do here
+    }
 }

@@ -15,19 +15,30 @@ import org.springframework.http.MediaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
-
-public class Page implements PageChangeListener {
+public class Page {
 
     private static Logger LOGGER = LoggerFactory.getLogger(Page.class);
 
-
     public static final String ROOT_NODE_ID = "root";
 
+    /**
+     * Id für das nächste an den Client zu sendende Element.
+     */
     private int id = 0;
 
-    private Tag bodyNode = new BodyTag();
+    /**
+     * Zuletzt an den Client gesandte ElementId;
+     */
+    private int lastSentId;
+
+    private final BodyTag bodyNode;
 
     private List<Change> changes = new ArrayList<>();
+
+    public Page() {
+        this.bodyNode = new BodyTag();
+        bodyNode.setId(nextId());
+    }
 
     public void render(PrintWriter writer) throws IOException {
         writer.write("<!DOCTYPE html>\n");
@@ -36,16 +47,21 @@ public class Page implements PageChangeListener {
         writer.write("<script type=\"text/javascript\" src=\"../javahtml.js\">");
         writer.write("</script>");
         writer.write("</head>\n");
-        bodyNode.render(this, writer);
+        writer.write("<body id=\"" + bodyNode.getId() + "\" onload=\"loadContent()\"/>");
         writer.write("</html>");
     }
-
 
     public int nextId() {
         return id++;
     }
 
+    public int getLastSentId() {
+        return lastSentId;
+    }
+
     public void sendChanges(HttpServletResponse resp) throws IOException {
+        List<Change> changesToSend = collectChanges();
+
         resp.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
         resp.setCharacterEncoding("UTF-8");
         ObjectMapper objectMapper = new ObjectMapper();
@@ -54,9 +70,39 @@ public class Page implements PageChangeListener {
         objectMapper.registerModule(module);
 
         try (OutputStreamWriter writer = new OutputStreamWriter(resp.getOutputStream(), "UTF-8")) {
-            objectMapper.writeValue(writer, changes);
+            objectMapper.writeValue(writer, changesToSend);
         }
+        lastSentId = id - 1;
         clearChanges();
+    }
+
+    private List<Change> collectChanges() {
+        List<Change> result = new ArrayList<>();
+        findRemovedElements(result);
+        findNewElements(result);
+        findModifiedProperties(result);
+        findModifiedListeners(result);
+        return result;
+    }
+
+    private void findModifiedListeners(List<Change> result) {
+        // TODO Auto-generated method stub
+
+    }
+
+    private void findModifiedProperties(List<Change> result) {
+        // TODO Auto-generated method stub
+
+    }
+
+    private void findNewElements(List<Change> result) {
+        // TODO Auto-generated method stub
+
+    }
+
+    private void findRemovedElements(List<Change> result) {
+        // TODO Auto-generated method stub
+
     }
 
     public void sendListeners(HttpServletResponse resp) throws IOException {
@@ -76,7 +122,6 @@ public class Page implements PageChangeListener {
         }
     }
 
-    @Override
     public void changeHappened(Change change) {
         changes.add(change);
     }

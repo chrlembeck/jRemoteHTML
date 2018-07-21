@@ -9,4 +9,12 @@ public interface HTMLElement {
     void render(Page page, Writer writer) throws IOException;
 
     void collectListeners(List<Change> listeners);
+
+    /**
+     * Prüft, ob der Knoten dem Client schon bekannt ist, also bereits einmal an
+     * den Client gesendet wurde.
+     */
+    boolean isNewNode();
+
+    void unsetId();
 }
