@@ -16,12 +16,12 @@ public class PageConfiguration {
     public PageRegistry pageRegistry() {
         PageRegistry pageRegistry = new PageRegistry();
         pageRegistry.setDefaultPageName("default");
-        pageRegistry.registerPage("default", createDefaultPage());
+        pageRegistry.registerCreator("default", this::createDefaultPage);
 
         return pageRegistry;
     }
 
-    public Page createDefaultPage() {
+    public Page createDefaultPage(String name) {
         Page page = new Page();
         Tag body = page.getBodyNode();
         Span span = new Span("test");
@@ -29,7 +29,6 @@ public class PageConfiguration {
         body.appendElement(new Span("noch ein Test"));
         span.addClickListener(tag -> System.out.println(tag.getId()));
         span.addClickListener(tag -> body.insertElement(0, new TextNode("clicked")));
-
         return page;
     }
 }

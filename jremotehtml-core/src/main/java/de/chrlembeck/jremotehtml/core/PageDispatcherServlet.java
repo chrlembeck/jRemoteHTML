@@ -56,11 +56,13 @@ public class PageDispatcherServlet extends HttpServlet {
         }
         LOGGER.debug("pageName=" + pageName);
 
-        final Page page = pageRegistry.getPage(pageName);
-        if (page == null) {
-            resp.sendError(HttpStatus.NOT_FOUND.value(), "Keine Page mit dem Namen " + pageName + " gefunden.");
+        final PageCreator creator = pageRegistry.getPageCreator(pageName);
+        if (creator == null) {
+            resp.sendError(HttpStatus.NOT_FOUND.value(),
+                    "Kein PageCreator für die Page mit dem Namen " + pageName + " gefunden.");
             return;
         }
+        final Page page = creator.createPage(pageName);
         HttpSession session = req.getSession();
         LOGGER.debug("setting currentPage to session. " + session.getId() + " - " + page);
         session.setAttribute("currentPage", page);

@@ -6,29 +6,27 @@ import java.util.TreeMap;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
-import de.chrlembeck.jremotehtml.core.element.Page;
-
 @Component
 public class PageRegistry {
 
-	private Map<String, Page> pageMap = new TreeMap<>();
+    private Map<String, PageCreator> pageCreatorMap = new TreeMap<>();
 
-	private String defaultPageName;
+    private String defaultPageName;
 
-	public void setDefaultPageName(String defaultPageName) {
-		this.defaultPageName = defaultPageName;
-	}
+    public void setDefaultPageName(String defaultPageName) {
+        this.defaultPageName = defaultPageName;
+    }
 
-	public void registerPage(String name, Page page) {
-		Assert.hasLength(name, "Der Name darf nicht leer sein");
-		pageMap.put(name, page);
-	}
+    public void registerCreator(String name, PageCreator creator) {
+        Assert.hasLength(name, "Der Name darf nicht leer sein");
+        pageCreatorMap.put(name, creator);
+    }
 
-	public String getDefaultPageName() {
-		return defaultPageName;
-	}
+    public String getDefaultPageName() {
+        return defaultPageName;
+    }
 
-	public Page getPage(String pageName) {
-		return pageMap.get(pageName);
-	}
+    public PageCreator getPageCreator(String pageName) {
+        return pageCreatorMap.get(pageName);
+    }
 }
