@@ -165,4 +165,12 @@ public abstract class Tag implements HTMLElement, Iterable<HTMLElement> {
     public Iterator<HTMLElement> iterator() {
         return children.iterator();
     }
+
+    public int getChildCount() {
+        return children.size();
+    }
+
+    public HTMLElement childAd(int index) {
+        return children.get(index);
+    }
 }
