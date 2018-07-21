@@ -25,7 +25,7 @@ public class InsertTagSerializer extends JsonSerializer<InsertTagChange> {
         HTMLElement newChild = change.getNewChild();
         Tag parent = change.getParentTag();
         jgen.writeStartObject();
-        jgen.writeStringField("action", "appendTag");
+        jgen.writeStringField("action", "insertTag");
         jgen.writeNumberField("parentId", parent.getId());
         jgen.writeNumberField("position", change.getPosition());
         StringWriter writer = new StringWriter();

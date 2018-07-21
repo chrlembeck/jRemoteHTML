@@ -46,7 +46,7 @@ public abstract class Tag implements HTMLElement, Iterable<HTMLElement> {
         for (HTMLElement element : children) {
             element.render(writer);
         }
-        writer.write("</" + name + ">\n");
+        writer.write("</" + name + ">");
     }
 
     public Tag(String name) {
@@ -79,9 +79,13 @@ public abstract class Tag implements HTMLElement, Iterable<HTMLElement> {
         notifyChange(new NewClickListenerChange(this));
     }
 
-    public void appendElement(HTMLElement tag) {
-        children.add(tag);
-        tag.setParent(this);
+    public void appendElement(HTMLElement element) {
+        insertElement(getChildCount(), element);
+    }
+
+    public void insertElement(int index, HTMLElement element) {
+        children.add(index, element);
+        element.setParent(this);
     }
 
     protected void notifyChange(Change change) {

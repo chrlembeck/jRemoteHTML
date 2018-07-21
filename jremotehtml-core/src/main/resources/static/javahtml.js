@@ -7,12 +7,13 @@ function sendMessage(data) {
             var json = JSON.parse(request.responseText);
         	console.log(json);
         	for (var i = 0; i < json.length; i++) {
-        	    console.log(json[i]);
-        	    var action = json[i].action;
-        	    if (action === "appendTag") {
-        	    	appendTag(json[i].parentId, json[i].content);
+        		var currentChange = json[i];
+        	    console.log(currentChange);
+        	    var action = currentChange.action;
+        	    if (action === "insertTag") {
+        	    	insertTag(currentChange.parentId, currentChange.content, currentChange.position);
         	    } else if (action === "newClickListener") {
-        	    	newClickListener(json[i].elementId);
+        	    	newClickListener(currentChange.elementId);
         	    }
         	    
         	}
@@ -32,9 +33,10 @@ function loadContent() {
     sendMessage(data);
 }
 
-// Erstellt einen neuen child Knoten an dem Knoten mit der übergebenen parentId
+// Erstellt einen neuen child-Knoten an dem Knoten mit der übergebenen parentId
 // und füllt den Knoten mit dem als content übergebenen HTML-Fragment
-function appendTag(parentId, content) {
+function insertTag(parentId, content, position) {
+	console.log("inserting node on " + parentId + " at position " + position);
     var newNode = document.createDocumentFragment();
     var temp = document.createElement('div');
     temp.innerHTML = content;
@@ -42,7 +44,12 @@ function appendTag(parentId, content) {
         newNode.appendChild(temp.firstChild);
     }
     var parent = document.getElementById(parentId);
-    parent.appendChild(newNode);
+    var children = parent.childNodes;
+    if (position >= children.length) {
+        parent.appendChild(newNode);
+    } else {
+    	parent.insertBefore(newNode, children[position]);
+    }
 }
 
 function newClickListener(elementId) {
