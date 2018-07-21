@@ -1,4 +1,4 @@
-package de.chrlembeck.jremotehtml;
+package de.chrlembeck.jremotehtml.core;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,10 +20,6 @@ import org.springframework.boot.json.JsonParserFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
-
-import de.chrlembeck.jremotehtml.core.Page;
-import de.chrlembeck.jremotehtml.core.PageRegistry;
-import de.chrlembeck.jremotehtml.core.Tag;
 
 @WebServlet(urlPatterns = "/javahtml/*")
 @Component
