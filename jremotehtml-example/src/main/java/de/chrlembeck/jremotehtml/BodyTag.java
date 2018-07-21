@@ -1,4 +1,4 @@
-package de.chrlembeck.javahtml;
+package de.chrlembeck.jremotehtml;
 
 public class BodyTag extends Tag {
 

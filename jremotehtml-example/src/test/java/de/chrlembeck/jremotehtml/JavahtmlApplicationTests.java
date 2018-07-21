@@ -1,4 +1,4 @@
-package de.chrlembeck.javahtml;
+package de.chrlembeck.jremotehtml;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

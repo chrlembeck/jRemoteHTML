@@ -1,4 +1,4 @@
-package de.chrlembeck.javahtml;
+package de.chrlembeck.jremotehtml;
 
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;

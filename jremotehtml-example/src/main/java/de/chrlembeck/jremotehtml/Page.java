@@ -1,4 +1,4 @@
-package de.chrlembeck.javahtml;
+package de.chrlembeck.jremotehtml;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;

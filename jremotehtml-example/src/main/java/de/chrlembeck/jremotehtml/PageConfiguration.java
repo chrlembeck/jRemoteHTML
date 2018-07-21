@@ -1,4 +1,4 @@
-package de.chrlembeck.javahtml;
+package de.chrlembeck.jremotehtml;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
