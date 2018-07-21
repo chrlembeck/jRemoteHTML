@@ -1,4 +1,4 @@
-package de.chrlembeck.jremotehtml;
+package de.chrlembeck.jremotehtml.core;
 
 import java.util.Map;
 import java.util.TreeMap;

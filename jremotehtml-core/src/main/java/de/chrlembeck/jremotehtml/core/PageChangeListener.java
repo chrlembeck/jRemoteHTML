@@ -1,5 +1,4 @@
-package de.chrlembeck.jremotehtml;
-
+package de.chrlembeck.jremotehtml.core;
 
 public interface PageChangeListener {
 
