@@ -4,6 +4,8 @@ import de.chrlembeck.jremotehtml.core.change.Change;
 
 public class BodyTag extends Tag {
 
+    private static final long serialVersionUID = 7209157887363579568L;
+
     private Page page;
 
     public BodyTag(Page page) {

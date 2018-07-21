@@ -17,6 +17,8 @@ import de.chrlembeck.jremotehtml.core.change.NewClickListenerChange;
 
 public abstract class Tag implements HTMLElement, Iterable<HTMLElement> {
 
+    private static final long serialVersionUID = 4057061365461142402L;
+
     public static final int NO_ID = -1;
 
     private int id = NO_ID;

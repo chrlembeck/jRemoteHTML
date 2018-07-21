@@ -3,6 +3,7 @@ package de.chrlembeck.jremotehtml.core.element;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -26,7 +27,9 @@ import de.chrlembeck.jremotehtml.core.change.NewClickListenerChange;
 import de.chrlembeck.jremotehtml.core.change.serializer.InsertTagSerializer;
 import de.chrlembeck.jremotehtml.core.change.serializer.NewClickListenerSerializer;
 
-public class Page {
+public class Page implements Serializable {
+
+    private static final long serialVersionUID = 2050048533544808209L;
 
     private static Logger LOGGER = LoggerFactory.getLogger(Page.class);
 
@@ -184,7 +187,12 @@ public class Page {
         newTextNodes.add(element);
     }
 
-    public boolean isNewTextNode(TextNode node) {
+    /**
+     * Should only be used by {@link TextNode#isNewNode()}, since
+     * {@link #newTextNodes} only contains the new TextNodes, that are direct
+     * children of already known nodes to the client.
+     */
+    boolean isNewTextNode(TextNode node) {
         return newTextNodes.contains(node);
     }
 }

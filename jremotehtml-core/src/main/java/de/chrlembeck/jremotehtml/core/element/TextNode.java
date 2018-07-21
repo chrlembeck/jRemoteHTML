@@ -8,6 +8,8 @@ import de.chrlembeck.jremotehtml.core.change.Change;
 
 public class TextNode implements HTMLElement {
 
+    private static final long serialVersionUID = 344892465914416914L;
+
     private String text;
 
     private Tag parent;
