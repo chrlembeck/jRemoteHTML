@@ -4,9 +4,11 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -43,6 +45,8 @@ public class Page {
     private final BodyTag bodyNode = new BodyTag(this);
 
     private List<Change> changes = new ArrayList<>();
+
+    private Set<TextNode> newTextNodes = new HashSet<>();
 
     public Page() {
         bodyNode.setId(nextId());
@@ -121,6 +125,8 @@ public class Page {
                     if (element instanceof Tag) {
                         // Bei neuen Tags jetzt erst einmal neue Ids vergeben
                         ((Tag) element).assignIds(this);
+                    } else {
+                        newTextNodes.remove(element);
                     }
                     // den neuen Knoten in die Liste der Client-Änderungen
                     // übernehmen
@@ -167,9 +173,18 @@ public class Page {
 
     public void clearChanges() {
         changes.clear();
+        newTextNodes.clear();
     }
 
     public Tag getTagById(int elementId) {
         return bodyNode.getTagById(elementId);
+    }
+
+    public void registerNewTextNode(TextNode element) {
+        newTextNodes.add(element);
+    }
+
+    public boolean isNewTextNode(TextNode node) {
+        return newTextNodes.contains(node);
     }
 }

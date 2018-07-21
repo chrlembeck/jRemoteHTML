@@ -41,7 +41,7 @@ public class TextNode implements HTMLElement {
         }
 
         // TODO FIXME ALERT Prüfung einbauen, ob der knoten wirklich neu ist.
-        return false;
+        return getParent().getPage().isNewTextNode(this);
     }
 
     @Override

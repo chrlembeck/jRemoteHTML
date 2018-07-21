@@ -86,6 +86,9 @@ public abstract class Tag implements HTMLElement, Iterable<HTMLElement> {
     public void insertElement(int index, HTMLElement element) {
         children.add(index, element);
         element.setParent(this);
+        if (!isNewNode() && element instanceof TextNode) {
+            getPage().registerNewTextNode((TextNode) element);
+        }
     }
 
     protected void notifyChange(Change change) {

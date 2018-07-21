@@ -7,6 +7,7 @@ import de.chrlembeck.jremotehtml.core.PageRegistry;
 import de.chrlembeck.jremotehtml.core.element.Page;
 import de.chrlembeck.jremotehtml.core.element.Span;
 import de.chrlembeck.jremotehtml.core.element.Tag;
+import de.chrlembeck.jremotehtml.core.element.TextNode;
 
 @Configuration
 public class PageConfiguration {
@@ -27,6 +28,7 @@ public class PageConfiguration {
         body.appendElement(span);
         body.appendElement(new Span("noch ein Test"));
         span.addClickListener(tag -> System.out.println(tag.getId()));
+        span.addClickListener(tag -> body.insertElement(0, new TextNode("clicked")));
 
         return page;
     }
