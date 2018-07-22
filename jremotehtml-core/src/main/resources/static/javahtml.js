@@ -48,18 +48,13 @@ function splitTextFields(text) {
 	var escaping = false;
 	for (var i = 0; i < text.length; i++) {
 		var current = text.charAt(i);
-		if (current == "\\") {
-			if (escaping) {
-				part += current;
-				escaping = false;
-			} else {
-				escaping = true;
-			}
+		if (escaping) {
+			part += current;
+			escaping = false;
 		} else {
-			if (escaping) {
-				part += current;
-				escaping = false;
-			} else {
+    		if (current == "\\") {
+				escaping = true;
+    		} else {
 				if (current == "|") {
 					result.push(part);
 					part = "";
@@ -74,7 +69,8 @@ function splitTextFields(text) {
 }
 
 function splitTextNodes(node) {
-	if (node.nodeType == 3) {
+	if (node.nodeType == 3) { 
+		// text node
 		var text = node.nodeValue;
 		var parts = splitTextFields(text);
 		if (parts.length > 1) {
@@ -85,7 +81,8 @@ function splitTextNodes(node) {
 		    	node.parentNode.insertBefore(newNode, node);
 		    }
 		}
-	} else {
+	} else { 
+		// recursion
 		var children = node.childNodes;
 		for (var i = 0; i < children.length; i++) {
 			splitTextNodes(children[i]);

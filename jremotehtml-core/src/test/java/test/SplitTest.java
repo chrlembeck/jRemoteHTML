@@ -11,17 +11,12 @@ public class SplitTest {
         boolean escaping = false;
         for (int i = 0; i < text.length(); i++) {
             char current = text.charAt(i);
-            if (current == '\\') {
-                if (escaping) {
-                    part += current;
-                    escaping = false;
-                } else {
-                    escaping = true;
-                }
+            if (escaping) {
+                part += current;
+                escaping = false;
             } else {
-                if (escaping) {
-                    part += current;
-                    escaping = false;
+                if (current == '\\') {
+                    escaping = true;
                 } else {
                     if (current == '|') {
                         result.add(part);

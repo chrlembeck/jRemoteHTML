@@ -24,7 +24,8 @@ public class TextNode implements HTMLElement {
 
     @Override
     public void render(Writer writer) throws IOException {
-        writer.append(escape(text));
+        escape(text, writer);
+
     }
 
     @Override
@@ -64,21 +65,23 @@ public class TextNode implements HTMLElement {
         return text;
     }
 
-    public static String escape(String text) {
-        StringBuilder sb = new StringBuilder();
+    public static void escape(String text, Writer writer) throws IOException {
+        // ersetzt alle \ durch \\ und alle | durch \|, so dass sie auf der
+        // client-seite wieder erkannt werden können.
+        // Dies ist notwendig, damit aufeinanderfolgende Text Nodes durch |
+        // voneinander getrennt werden können.
         for (int i = 0; i < text.length(); i++) {
             char current = text.charAt(i);
             switch (current) {
             case '\\':
-                sb.append("\\\\");
+                writer.append("\\\\");
                 break;
             case '|':
-                sb.append("\\|");
+                writer.append("\\|");
                 break;
             default:
-                sb.append(current);
+                writer.append(current);
             }
         }
-        return sb.toString();
     }
 }
