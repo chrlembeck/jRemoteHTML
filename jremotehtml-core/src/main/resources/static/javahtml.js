@@ -42,6 +42,57 @@ function loadContent() {
     sendMessage(data);
 }
 
+function splitTextFields(text) {
+	var result = [];
+	var part = "";
+	var escaping = false;
+	for (var i = 0; i < text.length; i++) {
+		var current = text.charAt(i);
+		if (current == "\\") {
+			if (escaping) {
+				part += current;
+				escaping = false;
+			} else {
+				escaping = true;
+			}
+		} else {
+			if (escaping) {
+				part += current;
+				escaping = false;
+			} else {
+				if (current == "|") {
+					result.push(part);
+					part = "";
+				} else {
+    				part += current;
+				}
+			}
+		}
+	}
+	result.push(part);
+	return result;
+}
+
+function splitTextNodes(node) {
+	if (node.nodeType == 3) {
+		var text = node.nodeValue;
+		var parts = splitTextFields(text);
+		if (parts.length > 1) {
+		    console.log("splitted " + text + " into " + parts);
+		    node.nodeValue = parts[parts.length - 1];
+		    for (var i = parts.length-2; i >= 0; i--) {
+		    	var newNode = document.createTextNode(parts[i]);
+		    	node.parentNode.insertBefore(newNode, node);
+		    }
+		}
+	} else {
+		var children = node.childNodes;
+		for (var i = 0; i < children.length; i++) {
+			splitTextNodes(children[i]);
+		}
+	}
+}
+
 // Erstellt einen neuen child-Knoten an dem Knoten mit der übergebenen parentId
 // und füllt den Knoten mit dem als content übergebenen HTML-Fragment
 function insertTag(parentId, content, position) {
@@ -53,6 +104,9 @@ function insertTag(parentId, content, position) {
     while (temp.firstChild) {
         newNode.appendChild(temp.firstChild);
     }
+    splitTextNodes(newNode);
+    
+    
     var children = parent.childNodes;
     if (position >= children.length) {
         parent.appendChild(newNode);

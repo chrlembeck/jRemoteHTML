@@ -10,6 +10,10 @@ public class TextNode implements HTMLElement {
 
     private static final long serialVersionUID = 344892465914416914L;
 
+    public static final String SEPARATOR = "|";
+
+    public static final String ESCAPE = "\\";
+
     private String text;
 
     private Tag parent;
@@ -20,7 +24,7 @@ public class TextNode implements HTMLElement {
 
     @Override
     public void render(Writer writer) throws IOException {
-        writer.append(text);
+        writer.append(escape(text));
     }
 
     @Override
@@ -58,5 +62,23 @@ public class TextNode implements HTMLElement {
 
     public String getText() {
         return text;
+    }
+
+    public static String escape(String text) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < text.length(); i++) {
+            char current = text.charAt(i);
+            switch (current) {
+            case '\\':
+                sb.append("\\\\");
+                break;
+            case '|':
+                sb.append("\\|");
+                break;
+            default:
+                sb.append(current);
+            }
+        }
+        return sb.toString();
     }
 }

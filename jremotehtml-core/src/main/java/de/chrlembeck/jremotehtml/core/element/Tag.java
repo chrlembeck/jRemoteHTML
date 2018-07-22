@@ -48,8 +48,18 @@ public class Tag implements HTMLElement, Iterable<HTMLElement> {
             writer.write("\"");
         }
         writer.write(">");
+        boolean wasTextNode = false;
         for (HTMLElement element : children) {
-            element.render(writer);
+            if (element instanceof TextNode) {
+                if (wasTextNode) {
+                    writer.append(TextNode.SEPARATOR);
+                }
+                element.render(writer);
+                wasTextNode = true;
+            } else {
+                element.render(writer);
+                wasTextNode = false;
+            }
         }
         writer.write("</" + name + ">");
     }
