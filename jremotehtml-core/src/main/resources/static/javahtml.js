@@ -37,13 +37,13 @@ function loadContent() {
 // und füllt den Knoten mit dem als content übergebenen HTML-Fragment
 function insertTag(parentId, content, position) {
 	console.log("inserting node on " + parentId + " at position " + position);
+    var parent = document.getElementById(parentId);
     var newNode = document.createDocumentFragment();
-    var temp = document.createElement('div');
+    var temp = document.createElement(parent.nodeName);
     temp.innerHTML = content;
     while (temp.firstChild) {
         newNode.appendChild(temp.firstChild);
     }
-    var parent = document.getElementById(parentId);
     var children = parent.childNodes;
     if (position >= children.length) {
         parent.appendChild(newNode);
