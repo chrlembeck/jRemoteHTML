@@ -4,8 +4,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import de.chrlembeck.jremotehtml.core.PageRegistry;
+import de.chrlembeck.jremotehtml.core.element.HTMLElement;
 import de.chrlembeck.jremotehtml.core.element.Page;
 import de.chrlembeck.jremotehtml.core.element.Span;
+import de.chrlembeck.jremotehtml.core.element.Table;
 import de.chrlembeck.jremotehtml.core.element.Tag;
 import de.chrlembeck.jremotehtml.core.element.TextNode;
 
@@ -29,6 +31,56 @@ public class PageConfiguration {
         body.appendElement(new Span("noch ein Test"));
         span.addClickListener(tag -> System.out.println(tag.getId()));
         span.addClickListener(tag -> body.insertElement(0, new TextNode("clicked")));
+        final Table table = createTable();
+        body.appendElement(table);
+        Tag btAdd = new Tag("button");
+        btAdd.appendElement(new TextNode("hinzufügen"));
+        btAdd.addClickListener(event -> insertRow(table));
+        body.appendElement(btAdd);
+        Tag btRemove = new Tag("button");
+        btRemove.appendElement(new TextNode("Löschen"));
+        btRemove.addClickListener(event -> removeRow(table));
+        body.appendElement(btRemove);
+        Tag btRemoveName = new Tag("button");
+        btRemoveName.appendElement(new TextNode("Name löschen"));
+        btRemoveName.addClickListener(event -> removeNameFromRow(table));
+        body.appendElement(btRemoveName);
         return page;
+    }
+
+    public Table createTable() {
+        Table table = new Table();
+        Tag headerRow = createRow("th", "Name", "Vorname");
+        table.getHeader().appendElement(headerRow);
+        return table;
+    }
+
+    private Tag createRow(String type, String... content) {
+        Tag row = new Tag("tr");
+        for (String value : content) {
+            Tag data = new Tag(type);
+            data.appendElement(new TextNode(value));
+            row.appendElement(data);
+        }
+        return row;
+    }
+
+    public void insertRow(Table table) {
+        Tag tbody = table.getBody();
+        tbody.appendElement(createRow("td", "Hans " + tbody.getChildCount(), "Mustermann " + tbody.getChildCount()));
+    }
+
+    public void removeRow(Table table) {
+        Tag tbody = table.getBody();
+        Tag row = (Tag) tbody.childAt(tbody.getChildCount() - 1);
+        tbody.removeElement(row);
+    }
+
+    public void removeNameFromRow(Table table) {
+        Tag tbody = table.getBody();
+        Tag row = (Tag) tbody.childAt(tbody.getChildCount() - 1);
+        Tag data = (Tag) row.childAt(0);
+        HTMLElement textNode = data.childAt(0);
+        data.removeElement(textNode);
     }
 }
