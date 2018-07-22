@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import de.chrlembeck.jremotehtml.components.ModalMessage;
 import de.chrlembeck.jremotehtml.core.ClickListener;
 import de.chrlembeck.jremotehtml.core.PageRegistry;
 import de.chrlembeck.jremotehtml.core.element.Button;
@@ -51,6 +52,7 @@ public class PageConfiguration {
 
         body.appendElement(new Button("Toggle Listener", event -> toggleListener(btListener)));
         body.appendElement(btListener);
+        body.appendElement(new Button("Message", event -> ModalMessage.showInfoMessage(page, "Hello World!")));
 
         Tag span2 = new Tag("span");
         span2.appendElement(new TextNode("Node1 "));

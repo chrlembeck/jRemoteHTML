@@ -68,6 +68,35 @@ public class Tag implements HTMLElement, Iterable<HTMLElement> {
         writer.write("</" + name + ">");
     }
 
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("<" + name + " id=\"" + getId() + "\"");
+        for (Map.Entry<String, String> attribute : attributes.entrySet()) {
+            sb.append(" ");
+            sb.append(attribute.getKey());
+            sb.append("=\"");
+            sb.append(attribute.getValue());
+            sb.append("\"");
+        }
+        sb.append(">");
+        boolean wasTextNode = false;
+        for (HTMLElement element : children) {
+            if (element instanceof TextNode) {
+                if (wasTextNode) {
+                    sb.append(TextNode.SEPARATOR);
+                }
+                sb.append(element);
+                wasTextNode = true;
+            } else {
+                sb.append(element);
+                wasTextNode = false;
+            }
+        }
+        sb.append("</" + name + ">");
+        return sb.toString();
+    }
+
     public Tag(String name) {
         this.name = name;
     }
@@ -140,6 +169,16 @@ public class Tag implements HTMLElement, Iterable<HTMLElement> {
         }
         for (HTMLElement element : children) {
             element.collectListeners(listeners);
+        }
+    }
+
+    @Override
+    public void collectStyles(List<Change> styleChanges) {
+        for (Map.Entry<String, String> style : styles.entrySet()) {
+            styleChanges.add(new StyleModifiedChange(getId(), style.getKey(), style.getValue()));
+        }
+        for (HTMLElement element : children) {
+            element.collectStyles(styleChanges);
         }
     }
 

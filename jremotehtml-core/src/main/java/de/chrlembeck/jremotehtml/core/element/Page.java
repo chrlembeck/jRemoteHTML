@@ -70,6 +70,8 @@ public class Page implements Serializable {
         bodyNode = new BodyTag(this);
         bodyNode.setId(nextId());
         clearChanges();
+        System.err.println("new page");
+
     }
 
     public void render(PrintWriter writer) throws IOException {
@@ -162,6 +164,7 @@ public class Page implements Serializable {
                     changes.add(new InsertTagChange(currentTag, element, index));
                     // die Listener für die neuen Knoten hinzufügen
                     element.collectListeners(changes);
+                    element.collectStyles(changes);
                 } else {
                     if (element instanceof Tag) {
                         // TextNodes müssen nicht weiter überprüft werden, da
@@ -217,7 +220,7 @@ public class Page implements Serializable {
         changes.add(change);
     }
 
-    public Tag getBodyNode() {
+    public BodyTag getBodyNode() {
         return bodyNode;
     }
 
@@ -246,5 +249,10 @@ public class Page implements Serializable {
      */
     boolean isNewTextNode(TextNode node) {
         return newTextNodes.contains(node);
+    }
+
+    @Override
+    public String toString() {
+        return bodyNode.toString();
     }
 }

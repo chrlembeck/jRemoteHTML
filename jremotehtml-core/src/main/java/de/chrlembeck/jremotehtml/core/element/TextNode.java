@@ -32,6 +32,10 @@ public class TextNode implements HTMLElement {
     public void collectListeners(List<Change> listeners) {
     }
 
+    @Override
+    public void collectStyles(List<Change> listeners) {
+    }
+
     public Tag getParent() {
         return parent;
     }

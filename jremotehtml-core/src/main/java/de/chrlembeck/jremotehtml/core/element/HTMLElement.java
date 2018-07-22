@@ -11,7 +11,9 @@ public interface HTMLElement extends Serializable {
 
     void render(Writer writer) throws IOException;
 
-    void collectListeners(List<Change> listeners);
+    void collectListeners(List<Change> listenerChanges);
+
+    void collectStyles(List<Change> styleChanges);
 
     /**
      * Prüft, ob der Knoten dem Client schon bekannt ist, also bereits einmal an

@@ -64,51 +64,50 @@ public class PageDispatcherServlet extends HttpServlet {
         }
         final Page page = creator.createPage(pageName);
         HttpSession session = req.getSession();
-        LOGGER.debug("setting currentPage to session. " + session.getId() + " - " + page);
-        session.setAttribute("currentPage", page);
         resp.setContentType(MediaType.TEXT_HTML_VALUE);
         resp.setStatus(HttpStatus.OK.value());
         PrintWriter writer = resp.getWriter();
         page.render(writer);
         writer.flush();
+        LOGGER.debug("setting currentPage to session. " + session.getId() + " - " + page);
+        session.setAttribute("currentPage", page);
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        HttpSession session = req.getSession();
         org.springframework.boot.json.JsonParser parser = JsonParserFactory.getJsonParser();
         String json = readText(req.getInputStream(), req.getCharacterEncoding());
         Map<String, Object> requestMap = parser.parseMap(json);
         String action = (String) requestMap.get("action");
-        switch (action) {
-        case "loadContent":
-            loadContent(req, resp, requestMap);
-            return;
-        case "elementClicked":
-            elementClicked(req, resp, requestMap);
-            return;
-        default:
-            resp.sendError(HttpStatus.BAD_REQUEST.value(), "Unbekannte action angegeben: " + action);
-            return;
-        }
-    }
-
-    private void elementClicked(HttpServletRequest req, HttpServletResponse resp, Map<String, Object> requestMap)
-            throws IOException {
-        HttpSession session = req.getSession();
         Page page = (Page) session.getAttribute("currentPage");
         LOGGER.debug("Page read from session: " + session + " - " + page);
+        switch (action) {
+        case "loadContent":
+            loadContent(req, resp, requestMap, page);
+            break;
+        case "elementClicked":
+            elementClicked(req, resp, requestMap, page);
+            break;
+        default:
+            resp.sendError(HttpStatus.BAD_REQUEST.value(), "Unbekannte action angegeben: " + action);
+            break;
+        }
+        LOGGER.debug("setting currentPage to session. " + session.getId() + " - " + page);
+        session.setAttribute("currentPage", page);
+
+    }
+
+    private void elementClicked(HttpServletRequest req, HttpServletResponse resp, Map<String, Object> requestMap,
+            Page page) throws IOException {
         int elementId = Integer.parseInt(requestMap.get("elementId").toString());
         Tag tag = page.getTagById(elementId);
         tag.fireElementClicked();
         page.sendChanges(resp);
     }
 
-    private void loadContent(HttpServletRequest req, HttpServletResponse resp, Map<String, Object> requestMap)
-            throws IOException {
-        HttpSession session = req.getSession();
-        Page page = (Page) session.getAttribute("currentPage");
-        LOGGER.debug("Page read from session: " + session + " - " + page);
-
+    private void loadContent(HttpServletRequest req, HttpServletResponse resp, Map<String, Object> requestMap,
+            Page page) throws IOException {
         page.sendChanges(resp);
     }
 
