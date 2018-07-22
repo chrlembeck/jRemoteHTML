@@ -14,10 +14,15 @@ function sendMessage(data) {
         	    	insertTag(currentChange.parentId, currentChange.content, currentChange.position);
         	    } else if (action === "removeElement") {
         	    	removeElement(currentChange.parentId, currentChange.position, currentChange.childId);
+        	    } else if (action === "attributeModified") {
+        	    	attributeModified(currentChange.elementId, currentChange.key, currentChange.value);
+        	    } else if (action === "attributeRemoved") {
+        	    	attributeRemoved(currentChange.elementId, currentChange.key);
         	    } else if (action === "newClickListener") {
         	    	newClickListener(currentChange.elementId);
+        	    } else {
+        	    	alert("unknown action '" + action + "'.");
         	    }
-        	    
         	}
         	
         } else {
@@ -64,6 +69,18 @@ function removeElement(parentId, position, childId) {
 		var child = parent.childNodes[position];
 		parent.removeChild(child);
 	}
+}
+
+function attributeModified(elementId, key, value) {
+	console.log("attribute " + key + " modified on element " + elementId + " to " + value);
+	var element = document.getElementById(elementId);
+	element.setAttribute(key, value === undefined?'':value);
+}
+
+function attributeRemoved(elementId, key) {
+	console.log("remove attribute " + key + " from element " + elementId);
+	var element = document.getElementById(elementId);
+	element.removeAttribute(key);
 }
 
 function newClickListener(elementId) {

@@ -12,6 +12,8 @@ import java.util.TreeMap;
 import org.springframework.util.Assert;
 
 import de.chrlembeck.jremotehtml.core.ClickListener;
+import de.chrlembeck.jremotehtml.core.change.AttributeModifiedChange;
+import de.chrlembeck.jremotehtml.core.change.AttributeRemovedChange;
 import de.chrlembeck.jremotehtml.core.change.Change;
 import de.chrlembeck.jremotehtml.core.change.NewClickListenerChange;
 import de.chrlembeck.jremotehtml.core.change.RemoveElementChange;
@@ -100,10 +102,6 @@ public class Tag implements HTMLElement, Iterable<HTMLElement> {
         }
     }
 
-    public void setAttribute(String key, String value) {
-        attributes.put(key, value);
-    }
-
     @Override
     public void collectListeners(List<Change> listeners) {
         if (clickListeners != null && !clickListeners.isEmpty()) {
@@ -138,7 +136,7 @@ public class Tag implements HTMLElement, Iterable<HTMLElement> {
     }
 
     public void removeElement(HTMLElement element) {
-        // TODO Löschung in der Page eintragen (falls erreichbar)
+        // Löschung in der Page eintragen (falls erreichbar)
         // Bei Tags die ID des Tags merken, bei TextNodes die Position des Nodes
         // (die auf dem Client haben sollte). Dafür müssen die Geschwister vor
         // dem Textknoten gezählt werden, die nicht neu sind.
@@ -162,6 +160,24 @@ public class Tag implements HTMLElement, Iterable<HTMLElement> {
             }
         }
         element.unsetIds();
+    }
+
+    public void setAttribute(String key, String value) {
+        attributes.put(key, value);
+        if (!isNewNode()) {
+            getPage().changeHappened(new AttributeModifiedChange(getId(), key, value));
+        }
+    }
+
+    public void removeAttribute(String key) {
+        attributes.remove(key);
+        if (!isNewNode()) {
+            getPage().changeHappened(new AttributeRemovedChange(getId(), key));
+        }
+    }
+
+    public String getAttribute(String key) {
+        return attributes.get(key);
     }
 
     @Override

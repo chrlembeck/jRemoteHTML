@@ -21,10 +21,14 @@ import org.springframework.util.Assert;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
+import de.chrlembeck.jremotehtml.core.change.AttributeModifiedChange;
+import de.chrlembeck.jremotehtml.core.change.AttributeRemovedChange;
 import de.chrlembeck.jremotehtml.core.change.Change;
 import de.chrlembeck.jremotehtml.core.change.InsertTagChange;
 import de.chrlembeck.jremotehtml.core.change.NewClickListenerChange;
 import de.chrlembeck.jremotehtml.core.change.RemoveElementChange;
+import de.chrlembeck.jremotehtml.core.change.serializer.AttributeModifiedSerializer;
+import de.chrlembeck.jremotehtml.core.change.serializer.AttributeRemovedSerializer;
 import de.chrlembeck.jremotehtml.core.change.serializer.InsertTagSerializer;
 import de.chrlembeck.jremotehtml.core.change.serializer.NewClickListenerSerializer;
 import de.chrlembeck.jremotehtml.core.change.serializer.RemoveElementSerializer;
@@ -48,14 +52,16 @@ public class Page implements Serializable {
      */
     private int lastSentId;
 
-    private final BodyTag bodyNode = new BodyTag(this);
+    private final BodyTag bodyNode;
 
     private List<Change> changes = new ArrayList<>();
 
     private Set<TextNode> newTextNodes = new HashSet<>();
 
     public Page() {
+        bodyNode = new BodyTag(this);
         bodyNode.setId(nextId());
+        clearChanges();
     }
 
     public void render(PrintWriter writer) throws IOException {
@@ -87,6 +93,8 @@ public class Page implements Serializable {
         module.addSerializer(InsertTagChange.class, new InsertTagSerializer());
         module.addSerializer(NewClickListenerChange.class, new NewClickListenerSerializer());
         module.addSerializer(RemoveElementChange.class, new RemoveElementSerializer());
+        module.addSerializer(AttributeModifiedChange.class, new AttributeModifiedSerializer());
+        module.addSerializer(AttributeRemovedChange.class, new AttributeRemovedSerializer());
         objectMapper.registerModule(module);
 
         try (OutputStreamWriter writer = new OutputStreamWriter(resp.getOutputStream(), "UTF-8");
@@ -101,7 +109,7 @@ public class Page implements Serializable {
     private List<Change> collectChanges() {
         List<Change> result = new ArrayList<>();
         findRemovedElements(result);
-        findModifiedProperties(result);
+        findModifiedAttributes(result);
         findModifiedListeners(result);
         findNewElements(result);
         return result;
@@ -111,9 +119,10 @@ public class Page implements Serializable {
         changes.stream().filter(change -> change instanceof RemoveElementChange).forEach(result::add);
     }
 
-    private void findModifiedProperties(List<Change> result) {
-        // TODO Auto-generated method stub
-
+    private void findModifiedAttributes(List<Change> result) {
+        changes.stream()
+                .filter(change -> change instanceof AttributeModifiedChange || change instanceof AttributeRemovedChange)
+                .forEach(result::add);
     }
 
     private void findModifiedListeners(List<Change> result) {
@@ -143,10 +152,8 @@ public class Page implements Serializable {
                     element.collectListeners(changes);
                 } else {
                     if (element instanceof Tag) {
-
                         // TextNodes müssen nicht weiter überprüft werden, da
-                        // sie
-                        // keine children haben können.
+                        // sie keine children haben können.
                         queue.offer((Tag) element);
                     }
                 }
@@ -154,6 +161,7 @@ public class Page implements Serializable {
         }
     }
 
+    @Deprecated
     public void sendListeners(HttpServletResponse resp) throws IOException {
         resp.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
         resp.setCharacterEncoding("UTF-8");

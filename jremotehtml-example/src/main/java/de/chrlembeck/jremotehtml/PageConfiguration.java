@@ -45,7 +45,27 @@ public class PageConfiguration {
         btRemoveName.appendElement(new TextNode("Name löschen"));
         btRemoveName.addClickListener(event -> removeNameFromRow(table));
         body.appendElement(btRemoveName);
+        Tag btBorder = new Tag("button");
+        btBorder.appendElement(new TextNode("Rahmen"));
+        btBorder.addClickListener(event -> changeBorder(table));
+        body.appendElement(btBorder);
+
+        Tag span2 = new Tag("span");
+        span2.appendElement(new TextNode("Node1 "));
+        span2.appendElement(new TextNode("Node2 "));
+        body.appendElement(span2);
         return page;
+    }
+
+    private void changeBorder(Table table) {
+        String border = table.getAttribute("border");
+        if (border == null) {
+            table.setAttribute("border", "1");
+        } else if ("1".equals(border)) {
+            table.setAttribute("border", "3");
+        } else {
+            table.removeAttribute("border");
+        }
     }
 
     public Table createTable() {
