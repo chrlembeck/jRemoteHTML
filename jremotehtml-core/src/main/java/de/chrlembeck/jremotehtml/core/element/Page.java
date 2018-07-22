@@ -28,6 +28,7 @@ import de.chrlembeck.jremotehtml.core.change.RemoveElementChange;
 import de.chrlembeck.jremotehtml.core.change.serializer.InsertTagSerializer;
 import de.chrlembeck.jremotehtml.core.change.serializer.NewClickListenerSerializer;
 import de.chrlembeck.jremotehtml.core.change.serializer.RemoveElementSerializer;
+import de.chrlembeck.jremotehtml.core.util.LoggingWriter;
 
 public class Page implements Serializable {
 
@@ -88,8 +89,10 @@ public class Page implements Serializable {
         module.addSerializer(RemoveElementChange.class, new RemoveElementSerializer());
         objectMapper.registerModule(module);
 
-        try (OutputStreamWriter writer = new OutputStreamWriter(resp.getOutputStream(), "UTF-8")) {
-            objectMapper.writeValue(writer, changesToSend);
+        try (OutputStreamWriter writer = new OutputStreamWriter(resp.getOutputStream(), "UTF-8");
+                LoggingWriter logger = new LoggingWriter(writer)) {
+            objectMapper.writeValue(logger, changesToSend);
+            LOGGER.debug("Sending: " + logger.toString());
         }
         lastSentId = id - 1;
         clearChanges();
