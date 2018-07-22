@@ -27,11 +27,13 @@ import de.chrlembeck.jremotehtml.core.change.Change;
 import de.chrlembeck.jremotehtml.core.change.InsertTagChange;
 import de.chrlembeck.jremotehtml.core.change.NewClickListenerChange;
 import de.chrlembeck.jremotehtml.core.change.RemoveElementChange;
+import de.chrlembeck.jremotehtml.core.change.TextModifiedChange;
 import de.chrlembeck.jremotehtml.core.change.serializer.AttributeModifiedSerializer;
 import de.chrlembeck.jremotehtml.core.change.serializer.AttributeRemovedSerializer;
 import de.chrlembeck.jremotehtml.core.change.serializer.InsertTagSerializer;
 import de.chrlembeck.jremotehtml.core.change.serializer.NewClickListenerSerializer;
 import de.chrlembeck.jremotehtml.core.change.serializer.RemoveElementSerializer;
+import de.chrlembeck.jremotehtml.core.change.serializer.TextModifiedSerializer;
 import de.chrlembeck.jremotehtml.core.util.LoggingWriter;
 
 public class Page implements Serializable {
@@ -57,6 +59,8 @@ public class Page implements Serializable {
     private List<Change> changes = new ArrayList<>();
 
     private Set<TextNode> newTextNodes = new HashSet<>();
+
+    private Set<TextNode> modifiedTextNodes = new HashSet<>();
 
     public Page() {
         bodyNode = new BodyTag(this);
@@ -95,6 +99,7 @@ public class Page implements Serializable {
         module.addSerializer(RemoveElementChange.class, new RemoveElementSerializer());
         module.addSerializer(AttributeModifiedChange.class, new AttributeModifiedSerializer());
         module.addSerializer(AttributeRemovedChange.class, new AttributeRemovedSerializer());
+        module.addSerializer(TextModifiedChange.class, new TextModifiedSerializer());
         objectMapper.registerModule(module);
 
         try (OutputStreamWriter writer = new OutputStreamWriter(resp.getOutputStream(), "UTF-8");
@@ -112,6 +117,7 @@ public class Page implements Serializable {
         findModifiedAttributes(result);
         findModifiedListeners(result);
         findNewElements(result);
+        findTextModifications(result);
         return result;
     }
 
@@ -161,6 +167,26 @@ public class Page implements Serializable {
         }
     }
 
+    private void findTextModifications(List<Change> result) {
+        for (TextNode node : modifiedTextNodes) {
+            if (!node.isNewNode() && node.getParent() != null) {
+                int position = 0;
+                Tag parent = node.getParent();
+                for (int index = 0; index < parent.getChildCount(); index++) {
+                    HTMLElement child = parent.childAt(index);
+                    if (child == node) {
+                        break;
+                    }
+                    if (!child.isNewNode()) {
+                        position++;
+                    }
+                }
+
+                result.add(new TextModifiedChange(parent.getId(), position, node.getText()));
+            }
+        }
+    }
+
     @Deprecated
     public void sendListeners(HttpServletResponse resp) throws IOException {
         resp.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
@@ -190,6 +216,7 @@ public class Page implements Serializable {
     public void clearChanges() {
         changes.clear();
         newTextNodes.clear();
+        modifiedTextNodes.clear();
     }
 
     public Tag getTagById(int elementId) {
@@ -198,6 +225,10 @@ public class Page implements Serializable {
 
     public void registerNewTextNode(TextNode element) {
         newTextNodes.add(element);
+    }
+
+    public void registerModifiedTextNode(TextNode element) {
+        modifiedTextNodes.add(element);
     }
 
     /**

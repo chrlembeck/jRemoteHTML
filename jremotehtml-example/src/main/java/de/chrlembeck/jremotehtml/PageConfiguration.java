@@ -1,5 +1,7 @@
 package de.chrlembeck.jremotehtml;
 
+import java.time.LocalTime;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -50,11 +52,22 @@ public class PageConfiguration {
         btBorder.addClickListener(event -> changeBorder(table));
         body.appendElement(btBorder);
 
+        TextNode text = new TextNode("text");
+        Tag btModifyText = new Tag("button");
+        btModifyText.appendElement(new TextNode("Text"));
+        btModifyText.addClickListener(event -> changeText(text));
+        body.appendElement(text);
+        body.appendElement(btModifyText);
+
         Tag span2 = new Tag("span");
         span2.appendElement(new TextNode("Node1 "));
         span2.appendElement(new TextNode("Node2 "));
         body.appendElement(span2);
         return page;
+    }
+
+    private void changeText(TextNode text) {
+        text.setText(LocalTime.now().toString());
     }
 
     private void changeBorder(Table table) {

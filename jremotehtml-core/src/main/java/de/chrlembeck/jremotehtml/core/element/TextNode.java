@@ -48,4 +48,15 @@ public class TextNode implements HTMLElement {
     public void unsetIds() {
         // nothing to do here
     }
+
+    public void setText(String newText) {
+        this.text = newText;
+        if (!isNewNode()) {
+            getParent().getPage().registerModifiedTextNode(this);
+        }
+    }
+
+    public String getText() {
+        return text;
+    }
 }

@@ -135,7 +135,7 @@ public class Tag implements HTMLElement, Iterable<HTMLElement> {
         return null;
     }
 
-    public void removeElement(HTMLElement element) {
+    public final void removeElement(HTMLElement element) {
         // Löschung in der Page eintragen (falls erreichbar)
         // Bei Tags die ID des Tags merken, bei TextNodes die Position des Nodes
         // (die auf dem Client haben sollte). Dafür müssen die Geschwister vor
@@ -160,6 +160,7 @@ public class Tag implements HTMLElement, Iterable<HTMLElement> {
             }
         }
         element.unsetIds();
+        element.setParent(null);
     }
 
     public void setAttribute(String key, String value) {

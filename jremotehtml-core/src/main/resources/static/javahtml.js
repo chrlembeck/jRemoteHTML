@@ -18,6 +18,8 @@ function sendMessage(data) {
         	    	attributeModified(currentChange.elementId, currentChange.key, currentChange.value);
         	    } else if (action === "attributeRemoved") {
         	    	attributeRemoved(currentChange.elementId, currentChange.key);
+        	    } else if (action === "textModified") {
+        	    	textModified(currentChange.parentId, currentChange.position, currentChange.text);
         	    } else if (action === "newClickListener") {
         	    	newClickListener(currentChange.elementId);
         	    } else {
@@ -81,6 +83,12 @@ function attributeRemoved(elementId, key) {
 	console.log("remove attribute " + key + " from element " + elementId);
 	var element = document.getElementById(elementId);
 	element.removeAttribute(key);
+}
+
+function textModified(parentId, position, text) {
+	console.log("modify text on node " + parentId + " at Position " + position + " to " + text);
+	var parent = document.getElementById(parentId);
+	parent.childNodes[position].nodeValue = text;
 }
 
 function newClickListener(elementId) {
