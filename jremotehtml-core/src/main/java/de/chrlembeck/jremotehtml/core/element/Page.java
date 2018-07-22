@@ -24,14 +24,14 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import de.chrlembeck.jremotehtml.core.change.AttributeModifiedChange;
 import de.chrlembeck.jremotehtml.core.change.AttributeRemovedChange;
 import de.chrlembeck.jremotehtml.core.change.Change;
+import de.chrlembeck.jremotehtml.core.change.ClickListenerChange;
 import de.chrlembeck.jremotehtml.core.change.InsertTagChange;
-import de.chrlembeck.jremotehtml.core.change.NewClickListenerChange;
 import de.chrlembeck.jremotehtml.core.change.RemoveElementChange;
 import de.chrlembeck.jremotehtml.core.change.TextModifiedChange;
 import de.chrlembeck.jremotehtml.core.change.serializer.AttributeModifiedSerializer;
 import de.chrlembeck.jremotehtml.core.change.serializer.AttributeRemovedSerializer;
+import de.chrlembeck.jremotehtml.core.change.serializer.ClickListenerSerializer;
 import de.chrlembeck.jremotehtml.core.change.serializer.InsertTagSerializer;
-import de.chrlembeck.jremotehtml.core.change.serializer.NewClickListenerSerializer;
 import de.chrlembeck.jremotehtml.core.change.serializer.RemoveElementSerializer;
 import de.chrlembeck.jremotehtml.core.change.serializer.TextModifiedSerializer;
 import de.chrlembeck.jremotehtml.core.util.LoggingWriter;
@@ -95,7 +95,7 @@ public class Page implements Serializable {
         ObjectMapper objectMapper = new ObjectMapper();
         SimpleModule module = new SimpleModule();
         module.addSerializer(InsertTagChange.class, new InsertTagSerializer());
-        module.addSerializer(NewClickListenerChange.class, new NewClickListenerSerializer());
+        module.addSerializer(ClickListenerChange.class, new ClickListenerSerializer());
         module.addSerializer(RemoveElementChange.class, new RemoveElementSerializer());
         module.addSerializer(AttributeModifiedChange.class, new AttributeModifiedSerializer());
         module.addSerializer(AttributeRemovedChange.class, new AttributeRemovedSerializer());
@@ -132,8 +132,7 @@ public class Page implements Serializable {
     }
 
     private void findModifiedListeners(List<Change> result) {
-        // TODO Auto-generated method stub
-
+        changes.stream().filter(ClickListenerChange.class::isInstance).forEach(result::add);
     }
 
     private void findNewElements(List<Change> changes) {
@@ -193,7 +192,7 @@ public class Page implements Serializable {
         resp.setCharacterEncoding("UTF-8");
         ObjectMapper objectMapper = new ObjectMapper();
         SimpleModule module = new SimpleModule();
-        module.addSerializer(NewClickListenerChange.class, new NewClickListenerSerializer());
+        module.addSerializer(ClickListenerChange.class, new ClickListenerSerializer());
         objectMapper.registerModule(module);
         List<Change> listeners = new ArrayList<>();
         getBodyNode().collectListeners(listeners);

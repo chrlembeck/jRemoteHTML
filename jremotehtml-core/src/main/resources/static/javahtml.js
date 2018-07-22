@@ -20,8 +20,8 @@ function sendMessage(data) {
         	    	attributeRemoved(currentChange.elementId, currentChange.key);
         	    } else if (action === "textModified") {
         	    	textModified(currentChange.parentId, currentChange.position, currentChange.text);
-        	    } else if (action === "newClickListener") {
-        	    	newClickListener(currentChange.elementId);
+        	    } else if (action === "modifyClickListener") {
+        	    	modifyClickListener(currentChange.elementId, currentChange.enabled);
         	    } else {
         	    	alert("unknown action '" + action + "'.");
         	    }
@@ -91,11 +91,19 @@ function textModified(parentId, position, text) {
 	parent.childNodes[position].nodeValue = text;
 }
 
-function newClickListener(elementId) {
+var clickListenerAction = function(event) {
+	var elementId = event.target.id;
+    console.log("clicked: " + elementId);
+    var data = {"action":"elementClicked", "elementId":elementId};
+    sendMessage(data);    
+};
+
+function modifyClickListener(elementId, enabled) {
     var element = document.getElementById(elementId);
-    element.addEventListener("click", function() {
-        console.log("clicked: " + elementId);
-        var data = {"action": "elementClicked", "elementId":elementId};
-        sendMessage(data);    
-    });
+    
+    if (enabled) {
+        element.addEventListener("click", clickListenerAction);
+    } else {
+    	element.removeEventListener("click", clickListenerAction);
+    }
 }

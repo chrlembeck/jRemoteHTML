@@ -1,11 +1,14 @@
 package de.chrlembeck.jremotehtml;
 
 import java.time.LocalTime;
+import java.util.List;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import de.chrlembeck.jremotehtml.core.ClickListener;
 import de.chrlembeck.jremotehtml.core.PageRegistry;
+import de.chrlembeck.jremotehtml.core.element.Button;
 import de.chrlembeck.jremotehtml.core.element.HTMLElement;
 import de.chrlembeck.jremotehtml.core.element.Page;
 import de.chrlembeck.jremotehtml.core.element.Span;
@@ -35,35 +38,34 @@ public class PageConfiguration {
         span.addClickListener(tag -> body.insertElement(0, new TextNode("clicked")));
         final Table table = createTable();
         body.appendElement(table);
-        Tag btAdd = new Tag("button");
-        btAdd.appendElement(new TextNode("hinzufügen"));
-        btAdd.addClickListener(event -> insertRow(table));
-        body.appendElement(btAdd);
-        Tag btRemove = new Tag("button");
-        btRemove.appendElement(new TextNode("Löschen"));
-        btRemove.addClickListener(event -> removeRow(table));
-        body.appendElement(btRemove);
-        Tag btRemoveName = new Tag("button");
-        btRemoveName.appendElement(new TextNode("Name löschen"));
-        btRemoveName.addClickListener(event -> removeNameFromRow(table));
-        body.appendElement(btRemoveName);
-        Tag btBorder = new Tag("button");
-        btBorder.appendElement(new TextNode("Rahmen"));
-        btBorder.addClickListener(event -> changeBorder(table));
-        body.appendElement(btBorder);
+        body.appendElement(new Button("Hinzufügen", event -> insertRow(table)));
+        body.appendElement(new Button("Löschen", event -> removeRow(table)));
+        body.appendElement(new Button("Name löschen", event -> removeNameFromRow(table)));
+        body.appendElement(new Button("Rahmen", event -> changeBorder(table)));
 
         TextNode text = new TextNode("text");
-        Tag btModifyText = new Tag("button");
-        btModifyText.appendElement(new TextNode("Text"));
-        btModifyText.addClickListener(event -> changeText(text));
         body.appendElement(text);
-        body.appendElement(btModifyText);
+        body.appendElement(new Button("text", event -> changeText(text)));
+
+        Button btListener = new Button("Do something");
+
+        body.appendElement(new Button("Toggle Listener", event -> toggleListener(btListener)));
+        body.appendElement(btListener);
 
         Tag span2 = new Tag("span");
         span2.appendElement(new TextNode("Node1 "));
         span2.appendElement(new TextNode("Node2 "));
         body.appendElement(span2);
         return page;
+    }
+
+    private void toggleListener(Button button) {
+        List<ClickListener> clickListeners = button.getClickListeners();
+        if (clickListeners.size() == 0) {
+            button.addClickListener(l -> System.err.println(l.getId()));
+        } else {
+            button.removeClickListener(clickListeners.get(0));
+        }
     }
 
     private void changeText(TextNode text) {

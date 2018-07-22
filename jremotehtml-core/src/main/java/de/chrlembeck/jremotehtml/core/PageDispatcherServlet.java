@@ -97,7 +97,7 @@ public class PageDispatcherServlet extends HttpServlet {
         HttpSession session = req.getSession();
         Page page = (Page) session.getAttribute("currentPage");
         LOGGER.debug("Page read from session: " + session + " - " + page);
-        Integer elementId = (Integer) requestMap.get("elementId");
+        int elementId = Integer.parseInt(requestMap.get("elementId").toString());
         Tag tag = page.getTagById(elementId);
         tag.fireElementClicked();
         page.sendChanges(resp);

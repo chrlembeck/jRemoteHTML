@@ -15,7 +15,7 @@ import de.chrlembeck.jremotehtml.core.ClickListener;
 import de.chrlembeck.jremotehtml.core.change.AttributeModifiedChange;
 import de.chrlembeck.jremotehtml.core.change.AttributeRemovedChange;
 import de.chrlembeck.jremotehtml.core.change.Change;
-import de.chrlembeck.jremotehtml.core.change.NewClickListenerChange;
+import de.chrlembeck.jremotehtml.core.change.ClickListenerChange;
 import de.chrlembeck.jremotehtml.core.change.RemoveElementChange;
 
 public class Tag implements HTMLElement, Iterable<HTMLElement> {
@@ -81,11 +81,28 @@ public class Tag implements HTMLElement, Iterable<HTMLElement> {
 
     public void addClickListener(ClickListener listener) {
         clickListeners.add(listener);
-        notifyChange(new NewClickListenerChange(this));
+        if (clickListeners.size() == 1 && !isNewNode()) {
+            notifyChange(new ClickListenerChange(this, true));
+        }
+    }
+
+    public void removeClickListener(ClickListener clickListener) {
+        clickListeners.remove(clickListener);
+        if (clickListeners.isEmpty() && !isNewNode()) {
+            notifyChange(new ClickListenerChange(this, false));
+        }
+    }
+
+    public List<ClickListener> getClickListeners() {
+        return clickListeners;
     }
 
     public void appendElement(HTMLElement element) {
         insertElement(getChildCount(), element);
+    }
+
+    public void appendTextElement(String text) {
+        appendElement(new TextNode(text));
     }
 
     public void insertElement(int index, HTMLElement element) {
@@ -105,7 +122,7 @@ public class Tag implements HTMLElement, Iterable<HTMLElement> {
     @Override
     public void collectListeners(List<Change> listeners) {
         if (clickListeners != null && !clickListeners.isEmpty()) {
-            listeners.add(new NewClickListenerChange(this));
+            listeners.add(new ClickListenerChange(this, true));
         }
         for (HTMLElement element : children) {
             element.collectListeners(listeners);
