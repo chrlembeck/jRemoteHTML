@@ -18,6 +18,10 @@ function sendMessage(data) {
         	    	attributeModified(currentChange.elementId, currentChange.key, currentChange.value);
         	    } else if (action === "attributeRemoved") {
         	    	attributeRemoved(currentChange.elementId, currentChange.key);
+        	    } else if (action === "styleModified") {
+        	    	styleModified(currentChange.elementId, currentChange.key, currentChange.value);
+        	    } else if (action === "styleRemoved") {
+        	    	styleRemoved(currentChange.elementId, currentChange.key);
         	    } else if (action === "textModified") {
         	    	textModified(currentChange.parentId, currentChange.position, currentChange.text);
         	    } else if (action === "modifyClickListener") {
@@ -134,6 +138,18 @@ function attributeRemoved(elementId, key) {
 	console.log("remove attribute " + key + " from element " + elementId);
 	var element = document.getElementById(elementId);
 	element.removeAttribute(key);
+}
+
+function styleModified(elementId, key, value) {
+	console.log("style " + key + " modified on element " + elementId + " to " + value);
+	var element = document.getElementById(elementId);
+	element.style.setProperty(key, value === undefined?'':value);
+}
+
+function styleRemoved(elementId, key) {
+	console.log("remove style " + key + " from element " + elementId);
+	var element = document.getElementById(elementId);
+	element.style.removeProperty(key);
 }
 
 function textModified(parentId, position, text) {

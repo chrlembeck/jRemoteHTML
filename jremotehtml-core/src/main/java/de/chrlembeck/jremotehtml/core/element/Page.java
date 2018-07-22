@@ -27,12 +27,16 @@ import de.chrlembeck.jremotehtml.core.change.Change;
 import de.chrlembeck.jremotehtml.core.change.ClickListenerChange;
 import de.chrlembeck.jremotehtml.core.change.InsertTagChange;
 import de.chrlembeck.jremotehtml.core.change.RemoveElementChange;
+import de.chrlembeck.jremotehtml.core.change.StyleModifiedChange;
+import de.chrlembeck.jremotehtml.core.change.StyleRemovedChange;
 import de.chrlembeck.jremotehtml.core.change.TextModifiedChange;
 import de.chrlembeck.jremotehtml.core.change.serializer.AttributeModifiedSerializer;
 import de.chrlembeck.jremotehtml.core.change.serializer.AttributeRemovedSerializer;
 import de.chrlembeck.jremotehtml.core.change.serializer.ClickListenerSerializer;
 import de.chrlembeck.jremotehtml.core.change.serializer.InsertTagSerializer;
 import de.chrlembeck.jremotehtml.core.change.serializer.RemoveElementSerializer;
+import de.chrlembeck.jremotehtml.core.change.serializer.StyleModifiedSerializer;
+import de.chrlembeck.jremotehtml.core.change.serializer.StyleRemovedSerializer;
 import de.chrlembeck.jremotehtml.core.change.serializer.TextModifiedSerializer;
 import de.chrlembeck.jremotehtml.core.util.LoggingWriter;
 
@@ -99,6 +103,8 @@ public class Page implements Serializable {
         module.addSerializer(RemoveElementChange.class, new RemoveElementSerializer());
         module.addSerializer(AttributeModifiedChange.class, new AttributeModifiedSerializer());
         module.addSerializer(AttributeRemovedChange.class, new AttributeRemovedSerializer());
+        module.addSerializer(StyleModifiedChange.class, new StyleModifiedSerializer());
+        module.addSerializer(StyleRemovedChange.class, new StyleRemovedSerializer());
         module.addSerializer(TextModifiedChange.class, new TextModifiedSerializer());
         objectMapper.registerModule(module);
 
@@ -127,7 +133,8 @@ public class Page implements Serializable {
 
     private void findModifiedAttributes(List<Change> result) {
         changes.stream()
-                .filter(change -> change instanceof AttributeModifiedChange || change instanceof AttributeRemovedChange)
+                .filter(change -> change instanceof AttributeModifiedChange || change instanceof AttributeRemovedChange
+                        || change instanceof StyleModifiedChange || change instanceof StyleRemovedChange)
                 .forEach(result::add);
     }
 

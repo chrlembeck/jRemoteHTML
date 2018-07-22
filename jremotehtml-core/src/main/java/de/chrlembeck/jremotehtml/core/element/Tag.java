@@ -17,6 +17,8 @@ import de.chrlembeck.jremotehtml.core.change.AttributeRemovedChange;
 import de.chrlembeck.jremotehtml.core.change.Change;
 import de.chrlembeck.jremotehtml.core.change.ClickListenerChange;
 import de.chrlembeck.jremotehtml.core.change.RemoveElementChange;
+import de.chrlembeck.jremotehtml.core.change.StyleModifiedChange;
+import de.chrlembeck.jremotehtml.core.change.StyleRemovedChange;
 
 public class Tag implements HTMLElement, Iterable<HTMLElement> {
 
@@ -35,6 +37,8 @@ public class Tag implements HTMLElement, Iterable<HTMLElement> {
     private List<HTMLElement> children = new LinkedList<>();
 
     private Map<String, String> attributes = new TreeMap<>();
+
+    private Map<String, String> styles = new TreeMap<>();
 
     @Override
     public final void render(Writer writer) throws IOException {
@@ -197,6 +201,13 @@ public class Tag implements HTMLElement, Iterable<HTMLElement> {
         }
     }
 
+    public void setStyleAttribute(String key, String value) {
+        styles.put(key, value);
+        if (!isNewNode()) {
+            getPage().changeHappened(new StyleModifiedChange(getId(), key, value));
+        }
+    }
+
     public void removeAttribute(String key) {
         attributes.remove(key);
         if (!isNewNode()) {
@@ -204,8 +215,19 @@ public class Tag implements HTMLElement, Iterable<HTMLElement> {
         }
     }
 
+    public void removeStyleAttribute(String key) {
+        styles.remove(key);
+        if (!isNewNode()) {
+            getPage().changeHappened(new StyleRemovedChange(getId(), key));
+        }
+    }
+
     public String getAttribute(String key) {
         return attributes.get(key);
+    }
+
+    public String getStyleAttribute(String key) {
+        return styles.get(key);
     }
 
     @Override

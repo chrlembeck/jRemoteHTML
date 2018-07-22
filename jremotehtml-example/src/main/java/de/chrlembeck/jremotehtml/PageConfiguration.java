@@ -76,10 +76,13 @@ public class PageConfiguration {
         String border = table.getAttribute("border");
         if (border == null) {
             table.setAttribute("border", "1");
+            table.setStyleAttribute("border-color", "red");
         } else if ("1".equals(border)) {
             table.setAttribute("border", "3");
+            table.setStyleAttribute("border-color", "green");
         } else {
             table.removeAttribute("border");
+            table.removeStyleAttribute("border-color");
         }
     }
 
