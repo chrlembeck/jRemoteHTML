@@ -178,16 +178,18 @@ public class Page implements Serializable {
             if (!node.isNewNode() && node.getParent() != null) {
                 int position = 0;
                 Tag parent = node.getParent();
+                boolean found = false;
                 for (int index = 0; index < parent.getChildCount(); index++) {
                     HTMLElement child = parent.childAt(index);
                     if (child == node) {
+                        found = true;
                         break;
                     }
                     if (!child.isNewNode()) {
                         position++;
                     }
                 }
-
+                Assert.isTrue(found, "Der Textknoten wurde nicht gefunden.");
                 result.add(new TextModifiedChange(parent.getId(), position, node.getText()));
             }
         }

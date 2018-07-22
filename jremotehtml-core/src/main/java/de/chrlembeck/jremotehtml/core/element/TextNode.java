@@ -72,16 +72,15 @@ public class TextNode implements HTMLElement {
         // voneinander getrennt werden können.
         for (int i = 0; i < text.length(); i++) {
             char current = text.charAt(i);
-            switch (current) {
-            case '\\':
-                writer.append("\\\\");
-                break;
-            case '|':
-                writer.append("\\|");
-                break;
-            default:
-                writer.append(current);
+            if (current == '\\' || current == '|') {
+                writer.append('\\');
             }
+            writer.append(current);
         }
+    }
+
+    @Override
+    public String toString() {
+        return text;
     }
 }
