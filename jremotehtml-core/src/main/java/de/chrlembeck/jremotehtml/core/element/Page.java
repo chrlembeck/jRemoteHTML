@@ -24,8 +24,10 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import de.chrlembeck.jremotehtml.core.change.Change;
 import de.chrlembeck.jremotehtml.core.change.InsertTagChange;
 import de.chrlembeck.jremotehtml.core.change.NewClickListenerChange;
+import de.chrlembeck.jremotehtml.core.change.RemoveElementChange;
 import de.chrlembeck.jremotehtml.core.change.serializer.InsertTagSerializer;
 import de.chrlembeck.jremotehtml.core.change.serializer.NewClickListenerSerializer;
+import de.chrlembeck.jremotehtml.core.change.serializer.RemoveElementSerializer;
 
 public class Page implements Serializable {
 
@@ -81,8 +83,9 @@ public class Page implements Serializable {
         resp.setCharacterEncoding("UTF-8");
         ObjectMapper objectMapper = new ObjectMapper();
         SimpleModule module = new SimpleModule();
-        module.addSerializer(InsertTagChange.class, new InsertTagSerializer(this));
+        module.addSerializer(InsertTagChange.class, new InsertTagSerializer());
         module.addSerializer(NewClickListenerChange.class, new NewClickListenerSerializer());
+        module.addSerializer(RemoveElementChange.class, new RemoveElementSerializer());
         objectMapper.registerModule(module);
 
         try (OutputStreamWriter writer = new OutputStreamWriter(resp.getOutputStream(), "UTF-8")) {
@@ -102,8 +105,7 @@ public class Page implements Serializable {
     }
 
     private void findRemovedElements(List<Change> result) {
-        // TODO Auto-generated method stub
-
+        changes.stream().filter(change -> change instanceof RemoveElementChange).forEach(result::add);
     }
 
     private void findModifiedProperties(List<Change> result) {
@@ -123,7 +125,7 @@ public class Page implements Serializable {
         while (!queue.isEmpty()) {
             Tag currentTag = queue.poll();
             for (int index = 0; index < currentTag.getChildCount(); index++) {
-                final HTMLElement element = currentTag.childAd(index);
+                final HTMLElement element = currentTag.childAt(index);
                 if (element.isNewNode()) {
                     if (element instanceof Tag) {
                         // Bei neuen Tags jetzt erst einmal neue Ids vergeben

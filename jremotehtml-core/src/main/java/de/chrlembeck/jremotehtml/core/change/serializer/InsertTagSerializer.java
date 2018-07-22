@@ -9,16 +9,9 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 
 import de.chrlembeck.jremotehtml.core.change.InsertTagChange;
 import de.chrlembeck.jremotehtml.core.element.HTMLElement;
-import de.chrlembeck.jremotehtml.core.element.Page;
 import de.chrlembeck.jremotehtml.core.element.Tag;
 
 public class InsertTagSerializer extends JsonSerializer<InsertTagChange> {
-
-    private Page page;
-
-    public InsertTagSerializer(Page page) {
-        this.page = page;
-    }
 
     @Override
     public void serialize(InsertTagChange change, JsonGenerator jgen, SerializerProvider provider) throws IOException {

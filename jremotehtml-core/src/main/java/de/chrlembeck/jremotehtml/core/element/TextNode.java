@@ -45,7 +45,7 @@ public class TextNode implements HTMLElement {
     }
 
     @Override
-    public void unsetId() {
+    public void unsetIds() {
         // nothing to do here
     }
 }

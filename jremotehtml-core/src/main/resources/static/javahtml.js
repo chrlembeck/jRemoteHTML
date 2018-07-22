@@ -12,6 +12,8 @@ function sendMessage(data) {
         	    var action = currentChange.action;
         	    if (action === "insertTag") {
         	    	insertTag(currentChange.parentId, currentChange.content, currentChange.position);
+        	    } else if (action === "removeElement") {
+        	    	removeElement(currentChange.parentId, currentChange.position, currentChange.childId);
         	    } else if (action === "newClickListener") {
         	    	newClickListener(currentChange.elementId);
         	    }
@@ -50,6 +52,18 @@ function insertTag(parentId, content, position) {
     } else {
     	parent.insertBefore(newNode, children[position]);
     }
+}
+
+function removeElement(parentId, position, childId) {
+	console.log("removing element from element " + parentId + " with position " + position + " and id " + childId);
+	var parent = document.getElementById(parentId);
+	if (childId) {
+		var child = document.getElementById(childId);
+		parent.removeChild(child);
+	} else {
+		var child = parent.childNodes[position];
+		parent.removeChild(child);
+	}
 }
 
 function newClickListener(elementId) {

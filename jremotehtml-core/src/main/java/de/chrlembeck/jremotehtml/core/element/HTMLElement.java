@@ -19,7 +19,7 @@ public interface HTMLElement extends Serializable {
      */
     boolean isNewNode();
 
-    void unsetId();
+    void unsetIds();
 
     void setParent(Tag tag);
 }

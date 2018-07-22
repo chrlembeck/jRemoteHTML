@@ -14,8 +14,9 @@ import org.springframework.util.Assert;
 import de.chrlembeck.jremotehtml.core.ClickListener;
 import de.chrlembeck.jremotehtml.core.change.Change;
 import de.chrlembeck.jremotehtml.core.change.NewClickListenerChange;
+import de.chrlembeck.jremotehtml.core.change.RemoveElementChange;
 
-public abstract class Tag implements HTMLElement, Iterable<HTMLElement> {
+public class Tag implements HTMLElement, Iterable<HTMLElement> {
 
     private static final long serialVersionUID = 4057061365461142402L;
 
@@ -142,12 +143,32 @@ public abstract class Tag implements HTMLElement, Iterable<HTMLElement> {
         // (die auf dem Client haben sollte). Dafür müssen die Geschwister vor
         // dem Textknoten gezählt werden, die nicht neu sind.
 
-        element.unsetId();
+        if (!isNewNode()) {
+            int clientPosition = 0;
+            for (int index = 0; index < getChildCount(); index++) {
+                HTMLElement child = childAt(index);
+                if (child == element) {
+                    children.remove(index);
+                    break;
+                }
+                if (!child.isNewNode()) {
+                    clientPosition++;
+                }
+            }
+            if (element instanceof Tag) {
+                getPage().changeHappened(new RemoveElementChange(this, clientPosition, ((Tag) element).getId()));
+            } else {
+                getPage().changeHappened(new RemoveElementChange(this, clientPosition));
+            }
+        }
+        element.unsetIds();
     }
 
     @Override
-    public void unsetId() {
+    public void unsetIds() {
         id = NO_ID;
+        children.stream().filter(element -> (element instanceof Tag)).map(element -> (Tag) element)
+                .forEach(tag -> tag.unsetIds());
     }
 
     public void assignIds(final Page page) {
@@ -179,7 +200,7 @@ public abstract class Tag implements HTMLElement, Iterable<HTMLElement> {
         return children.size();
     }
 
-    public HTMLElement childAd(int index) {
+    public HTMLElement childAt(int index) {
         return children.get(index);
     }
 }
