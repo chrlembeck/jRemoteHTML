@@ -2,7 +2,7 @@ function JRemoteHTML() {
 
 	function sendMessage(data) {
 	   var request = new XMLHttpRequest();
-	    request.open("POST", "javahtml");
+	    request.open("POST", "jremotehtml");
 	    request.addEventListener('load', function(event) {
 	        if (request.status >= 200 && request.status < 300) {
 	            console.log(request.responseText);
