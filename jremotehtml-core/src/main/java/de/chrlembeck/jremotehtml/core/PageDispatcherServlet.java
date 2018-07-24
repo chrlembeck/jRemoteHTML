@@ -24,7 +24,7 @@ import org.springframework.stereotype.Component;
 import de.chrlembeck.jremotehtml.core.element.Page;
 import de.chrlembeck.jremotehtml.core.element.Tag;
 
-@WebServlet(urlPatterns = "/javahtml/*")
+@WebServlet(urlPatterns = { "/jremotehtml/*" })
 @Component
 public class PageDispatcherServlet extends HttpServlet {
 
