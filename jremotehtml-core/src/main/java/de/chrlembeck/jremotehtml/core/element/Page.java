@@ -66,22 +66,33 @@ public class Page implements Serializable {
 
     private Set<TextNode> modifiedTextNodes = new HashSet<>();
 
+	private List<String> components = new ArrayList<>();
+
     public Page() {
         bodyNode = new BodyTag(this);
         bodyNode.setId(nextId());
         clearChanges();
-        System.err.println("new page");
-
     }
+
+	public void registerComponent(String name) {
+		components.add(name);
+	}
 
     public void render(PrintWriter writer) throws IOException {
         writer.write("<!DOCTYPE html>\n");
         writer.write("<html>\n");
         writer.write("<head>");
-        writer.write("<script type=\"text/javascript\" src=\"../javahtml.js\">");
-        writer.write("</script>");
+		writer.write("<link rel=\"stylesheet\" href=\"../jremotehtml.css\"></script>");
+		for (String component : components) {
+			writer.write("<link rel=\"stylesheet\" href=\"../" + component + ".css\"></script>");
+		}
+
+		writer.write("<script type=\"text/javascript\" src=\"../jremotehtml.js\"></script>");
+		for (String component : components) {
+			writer.write("<script type=\"text/javascript\" src=\"../" + component + ".js\"></script>");
+		}
         writer.write("</head>\n");
-        writer.write("<body id=\"" + bodyNode.getId() + "\" onload=\"loadContent()\"/>");
+		writer.write("<body id=\"" + bodyNode.getId() + "\" onload=\"jremotehtml.loadContent()\"/>");
         writer.write("</html>");
     }
 
@@ -195,24 +206,6 @@ public class Page implements Serializable {
                 Assert.isTrue(found, "Der Textknoten wurde nicht gefunden.");
                 result.add(new TextModifiedChange(parent.getId(), position, node.getText()));
             }
-        }
-    }
-
-    @Deprecated
-    public void sendListeners(HttpServletResponse resp) throws IOException {
-        resp.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
-        resp.setCharacterEncoding("UTF-8");
-        ObjectMapper objectMapper = new ObjectMapper();
-        SimpleModule module = new SimpleModule();
-        module.addSerializer(ClickListenerChange.class, new ClickListenerSerializer());
-        objectMapper.registerModule(module);
-        List<Change> listeners = new ArrayList<>();
-        getBodyNode().collectListeners(listeners);
-
-        LOGGER.debug("register listeners: " + listeners);
-
-        try (OutputStreamWriter writer = new OutputStreamWriter(resp.getOutputStream(), "UTF-8")) {
-            objectMapper.writeValue(writer, listeners);
         }
     }
 
