@@ -1,79 +1,60 @@
 package de.chrlembeck.jremotehtml.components;
 
 import de.chrlembeck.jremotehtml.core.element.BodyTag;
+import de.chrlembeck.jremotehtml.core.element.Button;
+import de.chrlembeck.jremotehtml.core.element.Div;
 import de.chrlembeck.jremotehtml.core.element.Page;
 import de.chrlembeck.jremotehtml.core.element.Span;
 import de.chrlembeck.jremotehtml.core.element.Tag;
+import de.chrlembeck.jremotehtml.core.element.TagFactory;
 
+/**
+ * Idee für das Verwalten und hinzufügen von Modulen:
+ * <ul>
+ * <li>Jedes Modul darf eine eigene javascript-datei mitbringen, die der Startseite bekannt gemacht werden muss.</li>
+ * <li>Es existiert eine globale Registrierungsmethode, die aufgerufen wird, wenn ein DOM-Element eine bestimmte
+ * eigenschaft (classe, attribut) besitzt.</li>
+ * <li>Jedes Modul kann sich bei der Registrierungsmethode einklinken und eine Funktion hinterlegen, die aufgerufen
+ * wird, wenn ein gekennzeichneter Knoten hinzugefügt wird. Diese Methode kann dann entsprechende Listener
+ * registrieren.</li>
+ * <li></li>
+ * </ul>
+ * <a href=
+ * "https://wiki.selfhtml.org/wiki/JavaScript/Organisation_von_JavaScripten">https://wiki.selfhtml.org/wiki/JavaScript/Organisation_von_JavaScripten</a>
+ */
 public class ModalMessage {
 
-    public static void showInfoMessage(Page page, String message) {
-        BodyTag body = page.getBodyNode();
-        body.appendElement(createModal(message));
+	public static void showInfoMessage(Page page, String headerText, String message) {
+		BodyTag body = page.getBodyNode();
+		body.appendElement(createModal(headerText, message));
+	}
 
-    }
+	public static Tag createModal(String header, String message) {
+		Tag script = TagFactory.createTag("script").setAttribute("type", "text/javascript")
+				.appendTextElement("function hover_close() {alert(\"1\");}").create();
+		Tag textPar = TagFactory.createTag("p").appendTextElement(message).create();
+		Span close = TagFactory.createSpan("&times;").setClass("close-symbol")
+				.addClickListener(ModalMessage::closeButtonPressed).create();
+		Tag headerText = TagFactory.createH2(header).create();
+		Div modalHeader = TagFactory.createDiv().setClass("modal-header").appendElement(headerText).appendElement(close)
+				.create();
+		Div modalBody = TagFactory.createDiv().appendElement(textPar).setClass("modal-body").create();
+		Button button = TagFactory.createButton("Schließen", ModalMessage::closeButtonPressed).setClass("dialog-button")
+				.create();
+		Div modalFooter = TagFactory.createDiv().setClass("modal-footer").appendElement(button).create();
 
-    public static Tag createModal(String message) {
-        Tag background = new Tag("div");
-        Tag script = new Tag("script");
-        script.setAttribute("type", "text/javascript");
-        script.appendTextElement("function hover_close() {alert(\"1\");}");
-        // event.target.style.color='#000';
-        // event.target.style.text-decoration='none';
-        // event.target.style.cursor='pointer';
-        background.appendElement(script);
+		Tag dialog = TagFactory.createTag("div").setClass("modal-dialog").appendElement(modalHeader)
+				.appendElement(modalBody).appendElement(modalFooter).create();
+		Tag background = TagFactory.createTag("div").setClass("modal-background").appendElement(script)
+				.appendElement(dialog).create();
+		return background;
+	}
 
-        setBackgroundStyle(background);
-        Tag dialog = new Tag("div");
-        setDialogStyle(dialog);
-        Span close = new Span("&times;");
-        setCloseStyle(close);
-        Tag text = new Tag("p");
-        text.appendTextElement(message);
-        dialog.appendElement(close);
-        dialog.appendElement(text);
-        close.addClickListener(ModalMessage::closeButtonPressed);
-
-        background.appendElement(dialog);
-        return background;
-    }
-
-    private static void setCloseStyle(Span close) {
-        close.setStyleAttribute("color", "#aaa");
-        close.setStyleAttribute("float", "right");
-        close.setStyleAttribute("font-size", "28px");
-        close.setStyleAttribute("font-weight", "bold");
-        close.setAttribute("onmouseenter", "hover_close()");
-
-        // close.setAttribute("onmouseenter", "{alert('1'); alert('2');}");
-    }
-
-    public static void closeButtonPressed(Tag source) {
-        Tag dialog = source.getParent();
-        Tag background = dialog.getParent();
-        Tag body = background.getParent();
-        body.removeElement(background);
-    }
-
-    public static void setBackgroundStyle(Tag background) {
-        background.setStyleAttribute("display", "block");
-        background.setStyleAttribute("position", "fixed");
-        background.setStyleAttribute("z-index", "1");
-        background.setStyleAttribute("padding-top", "100px");
-        background.setStyleAttribute("left", "0");
-        background.setStyleAttribute("top", "0");
-        background.setStyleAttribute("width", "100%");
-        background.setStyleAttribute("height", "100%");
-        background.setStyleAttribute("overflow", "auto");
-        background.setStyleAttribute("background-color", "rgb(0,0,0)");
-        background.setStyleAttribute("background-color", "rgba(0,0,0,0.4)");
-    }
-
-    public static void setDialogStyle(Tag dialog) {
-        dialog.setStyleAttribute("background-color", "#fefefe");
-        dialog.setStyleAttribute("margin", "auto");
-        dialog.setStyleAttribute("padding", "20px");
-        dialog.setStyleAttribute("border", "1px solid #888");
-        dialog.setStyleAttribute("width", "80%");
-    }
+	public static void closeButtonPressed(Tag source) {
+		Tag dialogHeader = source.getParent();
+		Tag dialog = dialogHeader.getParent();
+		Tag background = dialog.getParent();
+		Tag body = background.getParent();
+		body.removeElement(background);
+	}
 }
