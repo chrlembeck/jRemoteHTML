@@ -179,6 +179,7 @@ function JRemoteHTML() {
 	
 	function registerComponent(component) {
 	    console.log("registering component " + component);
+	    component.initialize();
 	}
 	
 	return {

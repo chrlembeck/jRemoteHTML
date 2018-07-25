@@ -1,8 +1,12 @@
 function JRemoteHTMLComponents() {
 
-   return {
-   
-   };
+    function initialize() {
+        console.log("initializing JRemoteHTMLComponents");
+    }
+
+    return {
+        initialize: initialize;
+    };
 }
 
 var component = new JRemoteHTMLComponents();
