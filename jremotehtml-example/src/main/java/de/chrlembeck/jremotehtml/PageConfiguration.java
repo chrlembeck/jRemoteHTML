@@ -31,7 +31,7 @@ public class PageConfiguration {
 
     public Page createDefaultPage(String name) {
         Page page = new Page();
-		page.registerComponent("jremotehtml-components");
+        page.registerComponent("jremotehtml-components");
         Tag body = page.getBodyNode();
         Span span = new Span("test");
         body.appendElement(span);
@@ -53,7 +53,7 @@ public class PageConfiguration {
 
         body.appendElement(new Button("Toggle Listener", event -> toggleListener(btListener)));
         body.appendElement(btListener);
-		body.appendElement(new Button("Message", event -> ModalMessage.showInfoMessage(page, "Hello", "Hello World!")));
+        body.appendElement(new Button("Message", event -> ModalMessage.showInfoMessage(page, "Hello", "Hello World!")));
 
         Tag span2 = new Tag("span");
         span2.appendElement(new TextNode("Node1 "));

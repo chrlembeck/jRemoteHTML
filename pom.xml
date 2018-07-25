@@ -9,6 +9,7 @@
 	<modules>
 		<module>jremotehtml-core</module>
 		<module>jremotehtml-example</module>
+		<module>jremotehtml-components</module>
 	</modules>
 	<build>
 	</build>
