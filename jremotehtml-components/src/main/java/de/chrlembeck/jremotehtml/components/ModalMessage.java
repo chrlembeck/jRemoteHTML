@@ -4,7 +4,7 @@ import de.chrlembeck.jremotehtml.core.element.BodyTag;
 import de.chrlembeck.jremotehtml.core.element.Button;
 import de.chrlembeck.jremotehtml.core.element.Div;
 import de.chrlembeck.jremotehtml.core.element.Page;
-import de.chrlembeck.jremotehtml.core.element.Tag;
+import de.chrlembeck.jremotehtml.core.element.HTMLElement;
 import de.chrlembeck.jremotehtml.core.element.TagFactory;
 
 /**
@@ -26,39 +26,37 @@ import de.chrlembeck.jremotehtml.core.element.TagFactory;
  */
 public class ModalMessage {
 
-    public static void showInfoMessage(Page page, String headerText, String message) {
+	public static void showInfoMessage(Page page, String headerText, String message, String buttonText) {
         BodyTag body = page.getBodyNode();
-        body.appendElement(createModal(headerText, message));
+		body.appendElement(createModal(headerText, message, buttonText));
     }
 
-    public static Tag createModal(String header, String message) {
-        Tag script = TagFactory.createTag("script").setAttribute("type", "text/javascript")
-                .appendTextElement("function hover_close() {alert(\"1\");}").create();
-        Tag textPar = TagFactory.createTag("p").appendTextElement(message).create();
-        Tag headerText = TagFactory.createSpan(header).setClass("header-text").create();
-        Tag close = TagFactory.createSpan("&times;").setClass("close-symbol")
+	public static HTMLElement createModal(String header, String message, String buttonText) {
+        HTMLElement textPar = TagFactory.createTag("p").appendTextElement(message).create();
+        HTMLElement headerText = TagFactory.createSpan(header).setClass("header-text").create();
+        HTMLElement close = TagFactory.createSpan("&times;").setClass("close-symbol")
                 .addClickListener(ModalMessage::closeButtonPressed).create();
         Div clearFloat = TagFactory.createDiv().setAttribute("style", "clear: both;").create();
 
         Div modalHeader = TagFactory.createDiv().setClass("modal-header").appendElement(headerText).appendElement(close)
                 .appendElement(clearFloat).create();
         Div modalBody = TagFactory.createDiv().appendElement(textPar).setClass("modal-body").create();
-        Button button = TagFactory.createButton("Schließen", ModalMessage::closeButtonPressed).setClass("dialog-button")
+		Button button = TagFactory.createButton(buttonText, ModalMessage::closeButtonPressed).setClass("dialog-button")
                 .create();
         Div modalFooter = TagFactory.createDiv().setClass("modal-footer").appendElement(button).create();
 
-        Tag dialog = TagFactory.createTag("div").setClass("modal-dialog").appendElement(modalHeader)
+        HTMLElement dialog = TagFactory.createTag("div").setClass("modal-dialog").appendElement(modalHeader)
                 .appendElement(modalBody).appendElement(modalFooter).create();
-        Tag background = TagFactory.createTag("div").setClass("modal-background").appendElement(script)
+		HTMLElement background = TagFactory.createTag("div").setClass("modal-background")
                 .appendElement(dialog).create();
         return background;
     }
 
-    public static void closeButtonPressed(Tag source) {
-        Tag dialogHeader = source.getParent();
-        Tag dialog = dialogHeader.getParent();
-        Tag background = dialog.getParent();
-        Tag body = background.getParent();
+    public static void closeButtonPressed(HTMLElement source) {
+        HTMLElement dialogHeader = source.getParent();
+        HTMLElement dialog = dialogHeader.getParent();
+        HTMLElement background = dialog.getParent();
+        HTMLElement body = background.getParent();
         body.removeElement(background);
     }
 }
