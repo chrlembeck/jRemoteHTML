@@ -4,7 +4,7 @@ import de.chrlembeck.jremotehtml.core.ClickListener;
 
 public class TagFactory {
 
-	public static class TagCreator<T extends Tag> {
+	public static class TagCreator<T extends HTMLElement> {
 
 		private T tag;
 
@@ -34,7 +34,7 @@ public class TagFactory {
 			return this;
 		}
 
-		public TagCreator<T> appendElement(Tag script) {
+		public TagCreator<T> appendElement(HTMLElement script) {
 			tag.appendElement(script);
 			return this;
 		}
@@ -45,18 +45,18 @@ public class TagFactory {
 		}
 	}
 
-	public static TagCreator<Tag> createTag(String name) {
-		return new TagCreator<Tag>(new Tag(name));
+	public static TagCreator<GenericTag> createTag(String name) {
+		return new TagCreator<GenericTag>(new GenericTag(name));
 	}
 
 	public static TagCreator<Span> createSpan(String content) {
 		return new TagCreator<Span>(new Span(content));
 	}
 
-	public static TagCreator<Tag> createH2(String text) {
-		Tag h2 = new Tag("H2");
+	public static TagCreator<GenericTag> createH2(String text) {
+		GenericTag h2 = new GenericTag("H2");
 		h2.appendTextElement(text);
-		return new TagCreator<Tag>(h2);
+		return new TagCreator<GenericTag>(h2);
 	}
 
 	public static TagCreator<Div> createDiv() {

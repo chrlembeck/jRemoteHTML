@@ -1,19 +1,19 @@
 package de.chrlembeck.jremotehtml.core.change;
 
-import de.chrlembeck.jremotehtml.core.element.Tag;
+import de.chrlembeck.jremotehtml.core.element.HTMLElement;
 
 public class ClickListenerChange implements Change {
 
-    private Tag tag;
+    private HTMLElement tag;
 
     private boolean enabled;
 
-    public ClickListenerChange(Tag tag, boolean enabled) {
+    public ClickListenerChange(HTMLElement tag, boolean enabled) {
         this.tag = tag;
         this.enabled = enabled;
     }
 
-    public Tag getTag() {
+    public HTMLElement getTag() {
         return tag;
     }
 

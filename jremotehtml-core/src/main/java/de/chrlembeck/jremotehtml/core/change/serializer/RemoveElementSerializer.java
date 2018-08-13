@@ -7,14 +7,14 @@ import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 
 import de.chrlembeck.jremotehtml.core.change.RemoveElementChange;
-import de.chrlembeck.jremotehtml.core.element.Tag;
+import de.chrlembeck.jremotehtml.core.element.HTMLElement;
 
 public class RemoveElementSerializer extends JsonSerializer<RemoveElementChange> {
 
     @Override
     public void serialize(RemoveElementChange change, JsonGenerator jgen, SerializerProvider serializers)
             throws IOException {
-        Tag parent = change.getParent();
+        HTMLElement parent = change.getParent();
         jgen.writeStartObject();
         jgen.writeStringField("action", "removeElement");
         jgen.writeNumberField("parentId", parent.getId());

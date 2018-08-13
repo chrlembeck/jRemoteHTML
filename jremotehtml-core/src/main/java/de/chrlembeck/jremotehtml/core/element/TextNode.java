@@ -6,7 +6,7 @@ import java.util.List;
 
 import de.chrlembeck.jremotehtml.core.change.Change;
 
-public class TextNode implements HTMLElement {
+public final class TextNode implements HTMLDomNode {
 
     private static final long serialVersionUID = 344892465914416914L;
 
@@ -16,7 +16,7 @@ public class TextNode implements HTMLElement {
 
     private String text;
 
-    private Tag parent;
+    private HTMLElement parent;
 
     public TextNode(String text) {
         this.text = text;
@@ -36,12 +36,12 @@ public class TextNode implements HTMLElement {
     public void collectStyles(List<Change> listeners) {
     }
 
-    public Tag getParent() {
+    public HTMLElement getParent() {
         return parent;
     }
 
     @Override
-    public void setParent(Tag parent) {
+    public void setParent(HTMLElement parent) {
         this.parent = parent;
     }
 
@@ -51,11 +51,6 @@ public class TextNode implements HTMLElement {
             return true;
         }
         return getParent().getPage().isNewTextNode(this);
-    }
-
-    @Override
-    public void unsetIds() {
-        // nothing to do here
     }
 
     public void setText(String newText) {

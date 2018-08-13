@@ -20,292 +20,303 @@ import de.chrlembeck.jremotehtml.core.change.RemoveElementChange;
 import de.chrlembeck.jremotehtml.core.change.StyleModifiedChange;
 import de.chrlembeck.jremotehtml.core.change.StyleRemovedChange;
 
-public class Tag implements HTMLElement, Iterable<HTMLElement> {
+public abstract class HTMLElement implements HTMLDomNode, Iterable<HTMLDomNode> {
 
-    private static final long serialVersionUID = 4057061365461142402L;
+	private static final long serialVersionUID = 4057061365461142402L;
 
-    public static final int NO_ID = -1;
+	public static final int NO_ID = -1;
 
-    private int id = NO_ID;
+	private int id = NO_ID;
 
-    private String name;
+	private String name;
 
-    private Tag parent;
+	private HTMLElement parent;
 
-    private List<ClickListener> clickListeners = new ArrayList<>();
+	private List<ClickListener> clickListeners = new ArrayList<>();
 
-    private List<HTMLElement> children = new LinkedList<>();
+	private List<HTMLDomNode> children = new LinkedList<>();
 
-    private Map<String, String> attributes = new TreeMap<>();
+	private Map<String, String> attributes = new TreeMap<>();
 
-    private Map<String, String> styles = new TreeMap<>();
+	private Map<String, String> styles = new TreeMap<>();
 
-    @Override
-    public final void render(Writer writer) throws IOException {
-        Assert.isTrue(id != NO_ID, "Zu diesem Zeitpunkt sollte der Knoten eine ID besitzen.");
-        writer.write("<" + name + " id=\"" + getId() + "\"");
-        for (Map.Entry<String, String> attribute : attributes.entrySet()) {
-            writer.write(" ");
-            writer.write(attribute.getKey());
-            writer.write("=\"");
-            writer.write(attribute.getValue());
-            writer.write("\"");
-        }
-        writer.write(">");
-        boolean wasTextNode = false;
-        for (HTMLElement element : children) {
-            if (element instanceof TextNode) {
-                if (wasTextNode) {
-                    writer.append(TextNode.SEPARATOR);
-                }
-                element.render(writer);
-                wasTextNode = true;
-            } else {
-                element.render(writer);
-                wasTextNode = false;
-            }
-        }
-        writer.write("</" + name + ">");
-    }
+	@Override
+	public final void render(Writer writer) throws IOException {
+		Assert.isTrue(id != NO_ID, "Zu diesem Zeitpunkt sollte der Knoten eine ID besitzen.");
+		writer.write("<" + name + " id=\"" + getId() + "\"");
+		for (Map.Entry<String, String> attribute : attributes.entrySet()) {
+			writer.write(" ");
+			writer.write(attribute.getKey());
+			writer.write("=\"");
+			writer.write(attribute.getValue());
+			writer.write("\"");
+		}
+		writer.write(">");
+		boolean wasTextNode = false;
+		for (HTMLDomNode element : children) {
+			if (element instanceof TextNode) {
+				if (wasTextNode) {
+					writer.append(TextNode.SEPARATOR);
+				}
+				element.render(writer);
+				wasTextNode = true;
+			} else {
+				element.render(writer);
+				wasTextNode = false;
+			}
+		}
+		writer.write("</" + name + ">");
+	}
 
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("<" + name + " id=\"" + getId() + "\"");
-        for (Map.Entry<String, String> attribute : attributes.entrySet()) {
-            sb.append(" ");
-            sb.append(attribute.getKey());
-            sb.append("=\"");
-            sb.append(attribute.getValue());
-            sb.append("\"");
-        }
-        sb.append(">");
-        boolean wasTextNode = false;
-        for (HTMLElement element : children) {
-            if (element instanceof TextNode) {
-                if (wasTextNode) {
-                    sb.append(TextNode.SEPARATOR);
-                }
-                sb.append(element);
-                wasTextNode = true;
-            } else {
-                sb.append(element);
-                wasTextNode = false;
-            }
-        }
-        sb.append("</" + name + ">");
-        return sb.toString();
-    }
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("<" + name + " id=\"" + getId() + "\"");
+		for (Map.Entry<String, String> attribute : attributes.entrySet()) {
+			sb.append(" ");
+			sb.append(attribute.getKey());
+			sb.append("=\"");
+			sb.append(attribute.getValue());
+			sb.append("\"");
+		}
+		sb.append(">");
+		boolean wasTextNode = false;
+		for (HTMLDomNode element : children) {
+			if (element instanceof TextNode) {
+				if (wasTextNode) {
+					sb.append(TextNode.SEPARATOR);
+				}
+				sb.append(element);
+				wasTextNode = true;
+			} else {
+				sb.append(element);
+				wasTextNode = false;
+			}
+		}
+		sb.append("</" + name + ">");
+		return sb.toString();
+	}
 
-    public Tag(String name) {
-        this.name = name;
-    }
+	public HTMLElement(String name) {
+		this.name = name;
+	}
 
-    public int getId() {
-        return id;
-    }
+	public int getId() {
+		return id;
+	}
 
-    public void setId(int id) {
-        this.id = id;
-    }
+	void setId(int id) {
+		this.id = id;
+	}
 
-    public String getName() {
-        return name;
-    }
+	public String getName() {
+		return name;
+	}
 
-    @Override
-    public void setParent(Tag parent) {
-        this.parent = parent;
-    }
+	@Override
+	public void setParent(HTMLElement parent) {
+		this.parent = parent;
+	}
 
-    public Tag getParent() {
-        return parent;
-    }
+	public HTMLElement getParent() {
+		return parent;
+	}
 
-    public void addClickListener(ClickListener listener) {
-        clickListeners.add(listener);
-        if (clickListeners.size() == 1 && !isNewNode()) {
-            notifyChange(new ClickListenerChange(this, true));
-        }
-    }
+	public void addClickListener(ClickListener listener) {
+		clickListeners.add(listener);
+		if (clickListeners.size() == 1 && !isNewNode()) {
+			notifyChange(new ClickListenerChange(this, true));
+		}
+	}
 
-    public void removeClickListener(ClickListener clickListener) {
-        clickListeners.remove(clickListener);
-        if (clickListeners.isEmpty() && !isNewNode()) {
-            notifyChange(new ClickListenerChange(this, false));
-        }
-    }
+	public void removeClickListener(ClickListener clickListener) {
+		clickListeners.remove(clickListener);
+		if (clickListeners.isEmpty() && !isNewNode()) {
+			notifyChange(new ClickListenerChange(this, false));
+		}
+	}
 
-    public List<ClickListener> getClickListeners() {
-        return clickListeners;
-    }
+	public List<ClickListener> getClickListeners() {
+		return clickListeners;
+	}
 
-    public void appendElement(HTMLElement element) {
-        insertElement(getChildCount(), element);
-    }
+	protected void appendElement(HTMLDomNode element) {
+		insertElement(getChildCount(), element);
+	}
 
-    public void appendTextElement(String text) {
-        appendElement(new TextNode(text));
-    }
+	protected void appendTextElement(String text) {
+		appendElement(new TextNode(text));
+	}
 
-    public void insertElement(int index, HTMLElement element) {
-        children.add(index, element);
-        element.setParent(this);
-        if (!isNewNode() && element instanceof TextNode) {
-            getPage().registerNewTextNode((TextNode) element);
-        }
-    }
+	protected void insertElement(int index, HTMLDomNode element) {
+		children.add(index, element);
+		element.setParent(this);
+		if (!isNewNode() && element instanceof TextNode) {
+			getPage().registerNewTextNode((TextNode) element);
+		}
+	}
 
-    protected void notifyChange(Change change) {
-        if (parent != null) {
-            parent.notifyChange(change);
-        }
-    }
+	protected void notifyChange(Change change) {
+		if (parent != null) {
+			parent.notifyChange(change);
+		}
+	}
 
-    @Override
-    public void collectListeners(List<Change> listeners) {
-        if (clickListeners != null && !clickListeners.isEmpty()) {
-            listeners.add(new ClickListenerChange(this, true));
-        }
-        for (HTMLElement element : children) {
-            element.collectListeners(listeners);
-        }
-    }
+	@Override
+	public void collectListeners(List<Change> listeners) {
+		if (clickListeners != null && !clickListeners.isEmpty()) {
+			listeners.add(new ClickListenerChange(this, true));
+		}
+		for (HTMLDomNode element : children) {
+			element.collectListeners(listeners);
+		}
+	}
 
-    @Override
-    public void collectStyles(List<Change> styleChanges) {
-        for (Map.Entry<String, String> style : styles.entrySet()) {
-            styleChanges.add(new StyleModifiedChange(getId(), style.getKey(), style.getValue()));
-        }
-        for (HTMLElement element : children) {
-            element.collectStyles(styleChanges);
-        }
-    }
+	@Override
+	public void collectStyles(List<Change> styleChanges) {
+		for (Map.Entry<String, String> style : styles.entrySet()) {
+			styleChanges.add(new StyleModifiedChange(getId(), style.getKey(), style.getValue()));
+		}
+		for (HTMLDomNode element : children) {
+			element.collectStyles(styleChanges);
+		}
+	}
 
-    public void fireElementClicked() {
-        for (ClickListener listener : clickListeners) {
-            listener.tagClicked(this);
-        }
-    }
+	public void fireElementClicked() {
+		for (ClickListener listener : clickListeners) {
+			listener.tagClicked(this);
+		}
+	}
 
-    public Tag getTagById(int elementId) {
-        if (elementId == this.id) {
-            return this;
-        } else {
-            for (HTMLElement element : children) {
-                if (element instanceof Tag) {
-                    Tag tag = (Tag) element;
-                    Tag result = tag.getTagById(elementId);
-                    if (result != null) {
-                        return result;
-                    }
-                }
-            }
-        }
-        return null;
-    }
+	public HTMLElement getElementById(int elementId) {
+		if (elementId == this.id) {
+			return this;
+		} else {
+			for (HTMLDomNode element : children) {
+				if (element instanceof HTMLElement) {
+					HTMLElement tag = (HTMLElement) element;
+					HTMLElement result = tag.getElementById(elementId);
+					if (result != null) {
+						return result;
+					}
+				}
+			}
+		}
+		return null;
+	}
 
-    public final void removeElement(HTMLElement element) {
-        // Löschung in der Page eintragen (falls erreichbar)
-        // Bei Tags die ID des Tags merken, bei TextNodes die Position des Nodes
-        // (die auf dem Client haben sollte). Dafür müssen die Geschwister vor
-        // dem Textknoten gezählt werden, die nicht neu sind.
+	public final void removeElement(HTMLDomNode element) {
+		// Löschung in der Page eintragen (falls erreichbar)
+		// Bei Tags die ID des Tags merken, bei TextNodes die Position des Nodes
+		// (die auf dem Client haben sollte). Dafür müssen die Geschwister vor
+		// dem Textknoten gezählt werden, die nicht neu sind.
 
-        if (!isNewNode()) {
-            int clientPosition = 0;
-            for (int index = 0; index < getChildCount(); index++) {
-                HTMLElement child = childAt(index);
-                if (child == element) {
-                    children.remove(index);
-                    break;
-                }
-                if (!child.isNewNode()) {
-                    clientPosition++;
-                }
-            }
-            if (element instanceof Tag) {
-                getPage().changeHappened(new RemoveElementChange(this, clientPosition, ((Tag) element).getId()));
-            } else {
-                getPage().changeHappened(new RemoveElementChange(this, clientPosition));
-            }
-        }
-        element.unsetIds();
-        element.setParent(null);
-    }
+		if (!isNewNode()) {
+			int clientPosition = 0;
+			for (int index = 0; index < getChildCount(); index++) {
+				HTMLDomNode child = childAt(index);
+				if (child == element) {
+					children.remove(index);
+					break;
+				}
+				if (!child.isNewNode()) {
+					clientPosition++;
+				}
+			}
+			if (element instanceof HTMLElement) {
+				getPage().changeHappened(new RemoveElementChange(this, clientPosition, ((HTMLElement) element).getId()));
+			} else {
+				getPage().changeHappened(new RemoveElementChange(this, clientPosition));
+			}
+		}
+		if (element instanceof HTMLElement) {
+			((HTMLElement) element).unsetIds();
+		}
+		element.setParent(null);
+	}
 
-    public void setAttribute(String key, String value) {
-        attributes.put(key, value);
-        if (!isNewNode()) {
-            getPage().changeHappened(new AttributeModifiedChange(getId(), key, value));
-        }
-    }
+	public void setAttribute(String key, String value) {
+		attributes.put(key, value);
+		if (!isNewNode()) {
+			getPage().changeHappened(new AttributeModifiedChange(getId(), key, value));
+		}
+	}
 
-    public void setStyleAttribute(String key, String value) {
-        styles.put(key, value);
-        if (!isNewNode()) {
-            getPage().changeHappened(new StyleModifiedChange(getId(), key, value));
-        }
-    }
+	public void setClass(String className) {
+		setAttribute("class", className);
+	}
 
-    public void removeAttribute(String key) {
-        attributes.remove(key);
-        if (!isNewNode()) {
-            getPage().changeHappened(new AttributeRemovedChange(getId(), key));
-        }
-    }
+	public void addClass(String className) {
+		final String oldDef = getAttribute("class");
+		final String newDef = oldDef == null ? className : (oldDef + " " + className);
+		setClass(newDef);
+	}
 
-    public void removeStyleAttribute(String key) {
-        styles.remove(key);
-        if (!isNewNode()) {
-            getPage().changeHappened(new StyleRemovedChange(getId(), key));
-        }
-    }
+	public void setStyleAttribute(String key, String value) {
+		styles.put(key, value);
+		if (!isNewNode()) {
+			getPage().changeHappened(new StyleModifiedChange(getId(), key, value));
+		}
+	}
 
-    public String getAttribute(String key) {
-        return attributes.get(key);
-    }
+	public void removeAttribute(String key) {
+		attributes.remove(key);
+		if (!isNewNode()) {
+			getPage().changeHappened(new AttributeRemovedChange(getId(), key));
+		}
+	}
 
-    public String getStyleAttribute(String key) {
-        return styles.get(key);
-    }
+	public void removeStyleAttribute(String key) {
+		styles.remove(key);
+		if (!isNewNode()) {
+			getPage().changeHappened(new StyleRemovedChange(getId(), key));
+		}
+	}
 
-    @Override
-    public void unsetIds() {
-        id = NO_ID;
-        children.stream().filter(element -> (element instanceof Tag)).map(element -> (Tag) element)
-                .forEach(tag -> tag.unsetIds());
-    }
+	public String getAttribute(String key) {
+		return attributes.get(key);
+	}
 
-    public void assignIds(final Page page) {
-        Assert.isTrue(id == NO_ID, "Der Knoten darf vorher noch keine Id gehabt haben.");
-        id = page.nextId();
-        children.stream().filter(element -> (element instanceof Tag)).map(element -> (Tag) element)
-                .forEach(tag -> tag.assignIds(page));
-    }
+	public String getStyleAttribute(String key) {
+		return styles.get(key);
+	}
 
-    @Override
-    public boolean isNewNode() {
-        if (parent == null) {
-            return true;
-        }
-        final Page page = getPage();
-        return page == null || id == NO_ID || page.getLastSentId() < id;
-    }
+	void unsetIds() {
+		id = NO_ID;
+		children.stream().filter(element -> (element instanceof HTMLElement)).map(element -> (HTMLElement) element)
+				.forEach(tag -> tag.unsetIds());
+	}
 
-    protected Page getPage() {
-        return parent == null ? null : parent.getPage();
-    }
+	void assignIds(final Page page) {
+		Assert.isTrue(id == NO_ID, "Der Knoten darf vorher noch keine Id gehabt haben.");
+		id = page.nextId();
+		children.stream().filter(element -> (element instanceof HTMLElement)).map(element -> (HTMLElement) element)
+				.forEach(tag -> tag.assignIds(page));
+	}
 
-    @Override
-    public Iterator<HTMLElement> iterator() {
-        return children.iterator();
-    }
+	@Override
+	public boolean isNewNode() {
+		if (parent == null) {
+			return true;
+		}
+		final Page page = getPage();
+		return page == null || id == NO_ID || page.getLastSentId() < id;
+	}
 
-    public int getChildCount() {
-        return children.size();
-    }
+	protected Page getPage() {
+		return parent == null ? null : parent.getPage();
+	}
 
-    public HTMLElement childAt(int index) {
-        return children.get(index);
-    }
+	@Override
+	public Iterator<HTMLDomNode> iterator() {
+		return children.iterator();
+	}
+
+	public int getChildCount() {
+		return children.size();
+	}
+
+	public HTMLDomNode childAt(int index) {
+		return children.get(index);
+	}
 }

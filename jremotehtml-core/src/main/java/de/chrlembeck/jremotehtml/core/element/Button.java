@@ -2,7 +2,7 @@ package de.chrlembeck.jremotehtml.core.element;
 
 import de.chrlembeck.jremotehtml.core.ClickListener;
 
-public class Button extends Tag {
+public class Button extends HTMLElement {
 
     private static final long serialVersionUID = 3896865565418897662L;
 

@@ -1,6 +1,6 @@
 package de.chrlembeck.jremotehtml.core.change;
 
-import de.chrlembeck.jremotehtml.core.element.Tag;
+import de.chrlembeck.jremotehtml.core.element.HTMLElement;
 
 public class RemoveElementChange implements Change {
 
@@ -8,21 +8,21 @@ public class RemoveElementChange implements Change {
 
     private final int position;
 
-    private final Tag parent;
+    private final HTMLElement parent;
 
-    public RemoveElementChange(Tag parent, int position, int id) {
+    public RemoveElementChange(HTMLElement parent, int position, int id) {
         this.parent = parent;
         this.position = position;
         this.id = id;
     }
 
-    public RemoveElementChange(Tag parent, int position) {
+    public RemoveElementChange(HTMLElement parent, int position) {
         this.parent = parent;
         this.position = position;
         this.id = null;
     }
 
-    public Tag getParent() {
+    public HTMLElement getParent() {
         return parent;
     }
 

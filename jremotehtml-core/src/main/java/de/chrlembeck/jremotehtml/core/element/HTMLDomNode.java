@@ -7,7 +7,7 @@ import java.util.List;
 
 import de.chrlembeck.jremotehtml.core.change.Change;
 
-public interface HTMLElement extends Serializable {
+public interface HTMLDomNode extends Serializable {
 
     void render(Writer writer) throws IOException;
 
@@ -21,7 +21,5 @@ public interface HTMLElement extends Serializable {
      */
     boolean isNewNode();
 
-    void unsetIds();
-
-    void setParent(Tag tag);
+    void setParent(HTMLElement tag);
 }

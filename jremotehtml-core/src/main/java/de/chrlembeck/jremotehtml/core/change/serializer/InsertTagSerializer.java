@@ -8,15 +8,15 @@ import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 
 import de.chrlembeck.jremotehtml.core.change.InsertTagChange;
+import de.chrlembeck.jremotehtml.core.element.HTMLDomNode;
 import de.chrlembeck.jremotehtml.core.element.HTMLElement;
-import de.chrlembeck.jremotehtml.core.element.Tag;
 
 public class InsertTagSerializer extends JsonSerializer<InsertTagChange> {
 
     @Override
     public void serialize(InsertTagChange change, JsonGenerator jgen, SerializerProvider provider) throws IOException {
-        HTMLElement newChild = change.getNewChild();
-        Tag parent = change.getParentTag();
+        HTMLDomNode newChild = change.getNewChild();
+        HTMLElement parent = change.getParentTag();
         jgen.writeStartObject();
         jgen.writeStringField("action", "insertTag");
         jgen.writeNumberField("parentId", parent.getId());

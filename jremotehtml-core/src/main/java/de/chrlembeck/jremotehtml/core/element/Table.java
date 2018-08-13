@@ -1,34 +1,34 @@
 package de.chrlembeck.jremotehtml.core.element;
 
-public class Table extends Tag {
+public class Table extends HTMLElement {
 
     private static final long serialVersionUID = -2957195969417418887L;
 
-    private Tag body;
+	private GenericTag body;
 
-    private Tag header;
+	private GenericTag header;
 
-    private Tag footer;
+	private GenericTag footer;
 
     public Table() {
         super("table");
-        header = new Tag("thead");
-        body = new Tag("tbody");
-        footer = new Tag("tfoot");
+		header = new GenericTag("thead");
+		body = new GenericTag("tbody");
+		footer = new GenericTag("tfoot");
         appendElement(header);
         appendElement(body);
         appendElement(footer);
     }
 
-    public Tag getBody() {
+	public GenericTag getBody() {
         return body;
     }
 
-    public Tag getFooter() {
+	public GenericTag getFooter() {
         return footer;
     }
 
-    public Tag getHeader() {
+	public GenericTag getHeader() {
         return header;
     }
 }

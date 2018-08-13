@@ -2,7 +2,7 @@ package de.chrlembeck.jremotehtml.core.element;
 
 import de.chrlembeck.jremotehtml.core.change.Change;
 
-public class BodyTag extends Tag {
+public class BodyTag extends ContainerTag {
 
     private static final long serialVersionUID = 7209157887363579568L;
 
@@ -32,5 +32,4 @@ public class BodyTag extends Tag {
         // the body node is always known to the client
         return false;
     }
-
 }
