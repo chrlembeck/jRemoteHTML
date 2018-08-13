@@ -30,6 +30,7 @@ import de.chrlembeck.jremotehtml.core.change.RemoveElementChange;
 import de.chrlembeck.jremotehtml.core.change.StyleModifiedChange;
 import de.chrlembeck.jremotehtml.core.change.StyleRemovedChange;
 import de.chrlembeck.jremotehtml.core.change.TextModifiedChange;
+import de.chrlembeck.jremotehtml.core.change.ValueListenerChange;
 import de.chrlembeck.jremotehtml.core.change.serializer.AttributeModifiedSerializer;
 import de.chrlembeck.jremotehtml.core.change.serializer.AttributeRemovedSerializer;
 import de.chrlembeck.jremotehtml.core.change.serializer.ClickListenerSerializer;
@@ -38,6 +39,7 @@ import de.chrlembeck.jremotehtml.core.change.serializer.RemoveElementSerializer;
 import de.chrlembeck.jremotehtml.core.change.serializer.StyleModifiedSerializer;
 import de.chrlembeck.jremotehtml.core.change.serializer.StyleRemovedSerializer;
 import de.chrlembeck.jremotehtml.core.change.serializer.TextModifiedSerializer;
+import de.chrlembeck.jremotehtml.core.change.serializer.ValueListenerSerializer;
 import de.chrlembeck.jremotehtml.core.util.LoggingWriter;
 
 public class Page implements Serializable {
@@ -82,9 +84,9 @@ public class Page implements Serializable {
         writer.write("<!DOCTYPE html>\n");
         writer.write("<html>\n");
         writer.write("<head>");
-		writer.write("<link rel=\"stylesheet\" href=\"../jremotehtml.css\"></script>");
+		writer.write("<link rel=\"stylesheet\" href=\"../jremotehtml.css\"/>");
 		for (String component : components) {
-			writer.write("<link rel=\"stylesheet\" href=\"../" + component + ".css\"></script>");
+			writer.write("<link rel=\"stylesheet\" href=\"../" + component + ".css\"/>");
 		}
 
 		writer.write("<script type=\"text/javascript\" src=\"../jremotehtml.js\"></script>");
@@ -92,7 +94,7 @@ public class Page implements Serializable {
 			writer.write("<script type=\"text/javascript\" src=\"../" + component + ".js\"></script>");
 		}
         writer.write("</head>\n");
-		writer.write("<body id=\"" + bodyNode.getId() + "\" onload=\"jremotehtml.loadContent()\"/>");
+		writer.write("<body id=\"" + bodyNode.getId() + "\" onload=\"jremotehtml.loadContent()\"></body>");
         writer.write("</html>");
     }
 
@@ -109,17 +111,7 @@ public class Page implements Serializable {
 
         resp.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
         resp.setCharacterEncoding("UTF-8");
-        ObjectMapper objectMapper = new ObjectMapper();
-        SimpleModule module = new SimpleModule();
-        module.addSerializer(InsertTagChange.class, new InsertTagSerializer());
-        module.addSerializer(ClickListenerChange.class, new ClickListenerSerializer());
-        module.addSerializer(RemoveElementChange.class, new RemoveElementSerializer());
-        module.addSerializer(AttributeModifiedChange.class, new AttributeModifiedSerializer());
-        module.addSerializer(AttributeRemovedChange.class, new AttributeRemovedSerializer());
-        module.addSerializer(StyleModifiedChange.class, new StyleModifiedSerializer());
-        module.addSerializer(StyleRemovedChange.class, new StyleRemovedSerializer());
-        module.addSerializer(TextModifiedChange.class, new TextModifiedSerializer());
-        objectMapper.registerModule(module);
+		ObjectMapper objectMapper = createObjectMapper();
 
         try (OutputStreamWriter writer = new OutputStreamWriter(resp.getOutputStream(), "UTF-8");
                 LoggingWriter logger = new LoggingWriter(writer)) {
@@ -129,6 +121,22 @@ public class Page implements Serializable {
         lastSentId = id - 1;
         clearChanges();
     }
+
+	private ObjectMapper createObjectMapper() {
+		ObjectMapper objectMapper = new ObjectMapper();
+        SimpleModule module = new SimpleModule();
+        module.addSerializer(InsertTagChange.class, new InsertTagSerializer());
+        module.addSerializer(ClickListenerChange.class, new ClickListenerSerializer());
+		module.addSerializer(ValueListenerChange.class, new ValueListenerSerializer());
+        module.addSerializer(RemoveElementChange.class, new RemoveElementSerializer());
+        module.addSerializer(AttributeModifiedChange.class, new AttributeModifiedSerializer());
+        module.addSerializer(AttributeRemovedChange.class, new AttributeRemovedSerializer());
+        module.addSerializer(StyleModifiedChange.class, new StyleModifiedSerializer());
+        module.addSerializer(StyleRemovedChange.class, new StyleRemovedSerializer());
+        module.addSerializer(TextModifiedChange.class, new TextModifiedSerializer());
+        objectMapper.registerModule(module);
+		return objectMapper;
+	}
 
     private List<Change> collectChanges() {
         List<Change> result = new ArrayList<>();
@@ -156,17 +164,17 @@ public class Page implements Serializable {
     }
 
     private void findNewElements(List<Change> changes) {
-        Queue<Tag> queue = new LinkedList<>();
+        Queue<HTMLElement> queue = new LinkedList<>();
         Assert.isTrue(bodyNode.isNewNode() == false, "Der BodyNode darf nie 'neu' sein.");
         queue.add(bodyNode);
         while (!queue.isEmpty()) {
-            Tag currentTag = queue.poll();
+            HTMLElement currentTag = queue.poll();
             for (int index = 0; index < currentTag.getChildCount(); index++) {
-                final HTMLElement element = currentTag.childAt(index);
+                final HTMLDomNode element = currentTag.childAt(index);
                 if (element.isNewNode()) {
-                    if (element instanceof Tag) {
+                    if (element instanceof HTMLElement) {
                         // Bei neuen Tags jetzt erst einmal neue Ids vergeben
-                        ((Tag) element).assignIds(this);
+                        ((HTMLElement) element).assignIds(this);
                     } else {
                         newTextNodes.remove(element);
                     }
@@ -177,10 +185,10 @@ public class Page implements Serializable {
                     element.collectListeners(changes);
                     element.collectStyles(changes);
                 } else {
-                    if (element instanceof Tag) {
+                    if (element instanceof HTMLElement) {
                         // TextNodes müssen nicht weiter überprüft werden, da
                         // sie keine children haben können.
-                        queue.offer((Tag) element);
+                        queue.offer((HTMLElement) element);
                     }
                 }
             }
@@ -191,10 +199,10 @@ public class Page implements Serializable {
         for (TextNode node : modifiedTextNodes) {
             if (!node.isNewNode() && node.getParent() != null) {
                 int position = 0;
-                Tag parent = node.getParent();
+                HTMLElement parent = node.getParent();
                 boolean found = false;
                 for (int index = 0; index < parent.getChildCount(); index++) {
-                    HTMLElement child = parent.childAt(index);
+                    HTMLDomNode child = parent.childAt(index);
                     if (child == node) {
                         found = true;
                         break;
@@ -223,8 +231,8 @@ public class Page implements Serializable {
         modifiedTextNodes.clear();
     }
 
-    public Tag getTagById(int elementId) {
-        return bodyNode.getTagById(elementId);
+    public HTMLElement getTagById(int elementId) {
+        return bodyNode.getElementById(elementId);
     }
 
     public void registerNewTextNode(TextNode element) {
