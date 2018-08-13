@@ -1,11 +1,13 @@
 function JRemoteHTML() {
 
-	function sendMessage(data) {
+    var components = [];
+    
+	function sendMessage(data, postAction) {
 	   var request = new XMLHttpRequest();
 	    request.open("POST", "jremotehtml");
 	    request.addEventListener('load', function(event) {
 	        if (request.status >= 200 && request.status < 300) {
-	            console.log(request.responseText);
+	            console.log("receiving: " + request.responseText);
 	            var json = JSON.parse(request.responseText);
 	        	console.log(json);
 	        	for (var i = 0; i < json.length; i++) {
@@ -28,24 +30,52 @@ function JRemoteHTML() {
 	        	    	textModified(currentChange.parentId, currentChange.position, currentChange.text);
 	        	    } else if (action === "modifyClickListener") {
 	        	    	modifyClickListener(currentChange.elementId, currentChange.enabled);
+	        	    } else if (action === "modifyValueListener") {
+	        	    	modifyValueListener(currentChange.elementId, currentChange.enabled);
 	        	    } else {
 	        	    	alert("unknown action '" + action + "'.");
 	        	    }
 	        	}
-	        	
+	        	if (postAction){
+	        	    postAction();
+	        	}
+	        	clearElementsWithModifiedValues();
 	        } else {
 	            console.warn(request.statusText, request.responseText);
 	        }
 	    });
+	    data.modifiedValues = collectModifiedValues();
 	    var message = JSON.stringify(data);
 	    console.log("sending message: " + message);
 	    request.send(message);
 	}
 	
+	function clearElementsWithModifiedValues() {
+      	var modifiedElements = document.querySelectorAll("[modified=modified]");
+        for (var i = 0; i < modifiedElements.length; i++){
+   	        modifiedElements[i].removeAttribute("modified"); 
+        }
+	}
+	
+	function collectModifiedValues() {
+	    var result = {};
+	    var modifiedElements = document.querySelectorAll("[modified=modified]");
+	    for (var i = 0; i < modifiedElements.length; i++){
+	        var element = modifiedElements[i];
+	    	result[element.id] = element.value; 
+	    }
+	    return result;
+	}
+	
 	function loadContent() {
 	    var data = {"action":"loadContent"};
 	    console.log("load content " + data);
-	    sendMessage(data);
+	    var postAction = function(){
+	    	for (var i = 0; i < components.length; i++) {
+	            components[i].initialize();
+	        }
+	    };
+	    sendMessage(data, postAction);
 	}
 	
 	function splitTextFields(text) {
@@ -104,17 +134,35 @@ function JRemoteHTML() {
 	    var newNode = document.createDocumentFragment();
 	    var temp = document.createElement(parent.nodeName);
 	    temp.innerHTML = content;
+		var nodesToInitialize = [];
 	    while (temp.firstChild) {
-	        newNode.appendChild(temp.firstChild);
+	        var node = temp.firstChild;
+	        nodesToInitialize.push(node);
+	        newNode.appendChild(node);
 	    }
 	    splitTextNodes(newNode);
-	    
-	    
+
 	    var children = parent.childNodes;
 	    if (position >= children.length) {
 	        parent.appendChild(newNode);
 	    } else {
 	    	parent.insertBefore(newNode, children[position]);
+	    }
+	    for (var i = 0; i < nodesToInitialize.length; i++) {
+	        initComponents(nodesToInitialize[i]);
+	    }
+	}
+	
+	function initComponents(element) {
+	    if (element.nodeType == 1) {
+    	    if (element.getAttribute("componentId")) {
+	            for (var i = 0; i < components.length; i++) {
+	                components[i].initComponent(element.getAttribute("componentId"), element);
+	            }
+	        }
+	    	for (var i = 0; i < element.children.length; i++) {
+	    	    initComponents(element.children[i]);
+	    	}
 	    }
 	}
 	
@@ -157,7 +205,11 @@ function JRemoteHTML() {
 	function textModified(parentId, position, text) {
 		console.log("modify text on node " + parentId + " at Position " + position + " to " + text);
 		var parent = document.getElementById(parentId);
-		parent.childNodes[position].nodeValue = text;
+		if (parent.childNodes.length > position) {
+		    parent.childNodes[position].nodeValue = text;
+		} else {
+		    console.warn("textModified: Child can not be found at parent " + parentId + " on position " + position + ". Parent element has only " + parent.childNodes.length + " children.");
+		}
 	}
 	
 	var clickListenerAction = function(event) {
@@ -176,15 +228,33 @@ function JRemoteHTML() {
 	    	element.removeEventListener("click", clickListenerAction);
 	    }
 	}
+
+	var valueListenerAction = function(event) {
+		var elementId = event.target.id;
+		console.log("value changed on element " + elementId);
+		event.target.setAttribute("modified", "modified");
+	};
+
+	function modifyValueListener(elementId, enabled) {
+	    var element = document.getElementById(elementId);
+	    
+	    if (enabled) {
+	        element.addEventListener("input", valueListenerAction);
+	    } else {
+	    	element.removeEventListener("input", valueListenerAction);
+	    }
+	}
 	
 	function registerComponent(component) {
 	    console.log("registering component " + component);
-	    component.initialize();
+	    components.push(component);
 	}
 	
 	return {
-	    // öffentliche definitionen
+	    // öffentliche Definitionen
+	    
 	  	loadContent: loadContent,
+	  	
 	  	registerComponent: registerComponent
 	};
 

@@ -22,7 +22,8 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
 import de.chrlembeck.jremotehtml.core.element.Page;
-import de.chrlembeck.jremotehtml.core.element.Tag;
+import de.chrlembeck.jremotehtml.core.element.HTMLElement;
+import de.chrlembeck.jremotehtml.core.element.ValueTag;
 
 @WebServlet(urlPatterns = { "/jremotehtml/*" })
 @Component
@@ -76,11 +77,13 @@ public class PageDispatcherServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         HttpSession session = req.getSession();
+		Page page = (Page) session.getAttribute("currentPage");
         org.springframework.boot.json.JsonParser parser = JsonParserFactory.getJsonParser();
         String json = readText(req.getInputStream(), req.getCharacterEncoding());
         Map<String, Object> requestMap = parser.parseMap(json);
+		handleModifiedValues(page, requestMap);
+		page.clearChanges();
         String action = (String) requestMap.get("action");
-        Page page = (Page) session.getAttribute("currentPage");
         LOGGER.debug("Page read from session: " + session + " - " + page);
         switch (action) {
         case "loadContent":
@@ -101,12 +104,25 @@ public class PageDispatcherServlet extends HttpServlet {
     private void elementClicked(HttpServletRequest req, HttpServletResponse resp, Map<String, Object> requestMap,
             Page page) throws IOException {
         int elementId = Integer.parseInt(requestMap.get("elementId").toString());
-        Tag tag = page.getTagById(elementId);
+        HTMLElement tag = page.getTagById(elementId);
         tag.fireElementClicked();
         page.sendChanges(resp);
     }
 
-    private void loadContent(HttpServletRequest req, HttpServletResponse resp, Map<String, Object> requestMap,
+	private void handleModifiedValues(Page page, Map<String, Object> requestMap) {
+		@SuppressWarnings("unchecked")
+		Map<String, String> modifiedValues = (Map<String, String>) requestMap.get("modifiedValues");
+		if (modifiedValues != null) {
+			for (Map.Entry<String, String> entry : modifiedValues.entrySet()) {
+				int elementId = Integer.parseInt(entry.getKey());
+				String newValue = entry.getValue();
+				ValueTag tag = (ValueTag) page.getTagById(elementId);
+				tag.setValue(newValue);
+			}
+		}
+	}
+
+	private void loadContent(HttpServletRequest req, HttpServletResponse resp, Map<String, Object> requestMap,
             Page page) throws IOException {
         page.sendChanges(resp);
     }

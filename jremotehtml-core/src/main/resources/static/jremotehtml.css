@@ -3,3 +3,7 @@
 body {
 	font-family: Calibri, Arial, Helvetica, sans-serif;
 }
+
+[modified=modified] {
+    background-color: #ffffe0;
+}
