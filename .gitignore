@@ -7,6 +7,7 @@ jremotehtml-core/.project
 jremotehtml-core/.classpath
 jremotehtml-example/.classpath
 .settings/org.eclipse.m2e.core.prefs
+.idea
 jremotehtml-example/.settings/org.eclipse.m2e.core.prefs
 jremotehtml-example/.settings
 jremotehtml-core/.settings/
